@@ -36,8 +36,7 @@ No middleman. Real monetization using Shelby's paid reads.
 3. `pnpm install` + `pnpm dev`
 
 ## Why I built this
-Shelby is perfect for AI data monetization. This project shows real multi-user paid reads in action – exactly what the team is looking for.
-
+Shelby is perfect for AI data monetization. This project shows real multi-user paid reads in action.
 ## Links
 - Shelby Website: https://shelby.xyz
 - Docs: https://docs.shelby.xyz
