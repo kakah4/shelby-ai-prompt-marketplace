@@ -11,4 +11,4 @@ Plan:
 
 Will be filled with real code right after Early Access approval.
 
-Built as proof-of-work by a beginner.
+
