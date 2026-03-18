@@ -1,6 +1,6 @@
 # Shelby AI Prompt Marketplace
 
-**Proof of Work** – Built by a complete beginner in March 2026 for Shelby Early Access on Aptos Testnet.
+**Proof of Work** – Built in  March 2026 for Shelby Early Access on Aptos Testnet.
 
 ## What it does
 A decentralized marketplace where **anyone** can:
