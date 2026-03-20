@@ -1,7 +1,7 @@
 # Shelby AI Prompt Marketplace
 
 ## Live Demo  
-[https://shelby-ai-prompt-marketplace-2hmbt87t5-kakah4s-projects.vercel.app](https://shelby-ai-prompt-marketplace-2hmbt87t5-kakah4s-projects.vercel.app)
+[https://shelby-ai-prompt-marketplace.vercel.app/](https://shelby-ai-prompt-marketplace.vercel.app/)
 
 ## GitHub Repo  
 https://github.com/kakah4/shelby-ai-prompt-marketplace
