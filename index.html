@@ -1,31 +1,41 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Shelby AI Prompt Marketplace</title>
-  <style>
-    body {font-family: system-ui; background: #0a0a0a; color: white; text-align: center; padding: 40px;}
-    .card {background: #1a1a1a; margin: 15px auto; padding: 20px; border-radius: 12px; max-width: 400px;}
-    .btn {background: #00ff9d; color: black; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold;}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shelby AI Prompt Marketplace</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h1>🚀 Shelby AI Prompt Marketplace</h1>
-  <p><strong>Live on Aptos Testnet — Anyone can upload prompts and earn from paid reads</strong></p>
 
-  <div class="card">
-    <h2>Example Prompts</h2>
-    <p><strong>Prompt 1:</strong> Explain decentralized hot storage for beginners</p>
-    <p><strong>Prompt 2:</strong> Midjourney prompt for cyberpunk city at night</p>
-    <p><strong>Prompt 3:</strong> ChatGPT system prompt for a helpful AI tutor</p>
-    <p style="color:#00ff9d; font-weight:bold;">Pay 0.001 ShelbyUSD to unlock full version + proof</p>
-  </div>
+    <!-- NAVBAR -->
+    <header>
+        <h1>🧠 Shelby AI Prompt Marketplace</h1>
+        <button onclick="connectWallet()">Connect Wallet</button>
+    </header>
 
-  <a href="#" class="btn">Connect Petra Wallet (Testnet)</a>
-  <p style="margin-top:30px; opacity:0.7;">Built with love for AI • Waiting for Early Access to add real paid reads</p>
-  
-  <p>
-    <a href="https://github.com/kakah4/shelby-ai-prompt-marketplace" style="color:#00ff9d">GitHub →</a> | 
-    <a href="https://explorer.shelby.xyz/testnet/account/0xb9ac2f1d40f1b693a30a0bdd28fb6ab0fb617af3a5a7a0ebbc46dfbc3ae86d89" style="color:#00ff9d">My Balance (180 ShelbyUSD) →</a>
-  </p>
+    <!-- HERO -->
+    <section class="hero">
+        <h2>Buy & Sell AI Prompts</h2>
+        <p>Monetize your prompts on-chain with Shelby + Aptos</p>
+    </section>
+
+    <!-- ACTIONS -->
+    <section class="actions">
+        <button onclick="uploadPrompt()">Upload Prompt</button>
+        <button onclick="viewMarketplace()">View Marketplace</button>
+    </section>
+
+    <!-- MARKETPLACE -->
+    <section id="marketplace">
+        <h2>Available Prompts</h2>
+        <div class="prompt-card">
+            <h3>🔥 Viral Tweet Generator</h3>
+            <p>Price: 0.5 APT</p>
+            <button onclick="unlockPrompt()">Unlock</button>
+        </div>
+    </section>
+
+    <script src="script.js"></script>
 </body>
 </html>
