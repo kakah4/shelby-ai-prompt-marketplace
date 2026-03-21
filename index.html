@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
     body { background: #0a0a0a; color: #fff; }
-    .neon { text-shadow: 0 0 20px #ec4899; } /* pink neon */
+    .neon { text-shadow: 0 0 20px #ec4899; }
     .card { transition: all 0.3s; }
     .card:hover { transform: translateY(-8px); box-shadow: 0 0 25px rgba(236, 72, 153, 0.5); }
     .hero-bg {
@@ -20,12 +20,11 @@
   </style>
 </head>
 <body class="font-sans">
-  <!-- Navbar -->
+  <!-- Navbar with your exact Shelby logo -->
   <nav class="bg-black border-b border-pink-500 sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-      <div class="flex items-center gap-3">
-        <i class="fa-solid fa-robot text-3xl text-pink-500"></i>
-        <h1 class="text-2xl font-bold neon">Shelby Prompts</h1>
+      <div>
+        <img src="shelby-logo.png" alt="Shelby Prompts" class="h-12 w-auto">
       </div>
       <div class="flex items-center gap-6">
         <button onclick="connectWallet()" id="walletBtn"
@@ -37,9 +36,8 @@
     </div>
   </nav>
 
-  <!-- Hero with your cartoon overlay -->
+  <!-- Hero with your cartoon overlay (unchanged) -->
   <section class="hero-bg relative py-32 text-center overflow-hidden">
-    <!-- Bold overlay layer -->
     <div class="absolute inset-0 bg-black/60"></div>
     <div class="max-w-4xl mx-auto px-6 relative z-10">
       <h2 class="text-5xl font-bold mb-4 neon text-pink-400">AI Prompt Marketplace on Shelby Testnet</h2>
@@ -83,7 +81,7 @@
     Built as beginner proof-of-work • Shelby Testnet • Petra Wallet • Aptos
   </footer>
 
-  <!-- Unlock Modal -->
+  <!-- Unlock Modal (same as before) -->
   <div id="modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50">
     <div class="bg-zinc-900 max-w-lg w-full mx-4 rounded-3xl p-8">
       <h4 id="modalTitle" class="text-2xl font-bold mb-4 text-pink-400"></h4>
