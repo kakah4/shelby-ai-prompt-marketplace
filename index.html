@@ -15,7 +15,8 @@
     .robot { font-size: 42px; color: #ff1493; animation: glow-pulse 2.2s ease-in-out infinite alternate; filter: drop-shadow(0 0 15px #ff69b4); }
     .shelby-text { font-size: 32px; font-weight: 900; color: #ff1493; text-shadow: 0 0 10px #ff69b4, 0 0 25px #ff1493, 0 0 45px #ec4899, 0 0 70px #ff1493; animation: glow-pulse 2.2s ease-in-out infinite alternate; }
     @keyframes glow-pulse { from { text-shadow: 0 0 8px #ff69b4, 0 0 20px #ff1493; } to { text-shadow: 0 0 20px #ff69b4, 0 0 45px #ff1493, 0 0 75px #ec4899, 0 0 100px #ff1493; } }
-    .no-results { text-align: center; padding: 60px 20px; color: #666; font-size: 1.1rem; }
+    .step-card { transition: all 0.3s; }
+    .step-card:hover { transform: scale(1.05); }
   </style>
 </head>
 <body class="font-sans">
@@ -57,7 +58,36 @@
       </div>
     </div>
     <div id="promptGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
-    <div id="noResults" class="no-results hidden">No prompts found 😔<br>Try a different search term</div>
+    <div id="noResults" class="hidden text-center py-12 text-gray-500 text-lg">No prompts found 😔 Try a different search</div>
+  </section>
+
+  <!-- HOW IT WORKS (NEW) -->
+  <section class="bg-zinc-950 py-16 border-t border-b border-pink-500">
+    <div class="max-w-5xl mx-auto px-6">
+      <h3 class="text-4xl font-bold text-center mb-12 text-pink-400">How It Works</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div class="step-card bg-zinc-900 p-8 rounded-3xl border border-pink-500 text-center">
+          <i class="fa-solid fa-wallet text-5xl text-pink-400 mb-4"></i>
+          <h4 class="font-bold text-xl mb-2">1. Connect Wallet</h4>
+          <p class="text-gray-400">Click "Connect Petra" and switch to Shelby Testnet</p>
+        </div>
+        <div class="step-card bg-zinc-900 p-8 rounded-3xl border border-pink-500 text-center">
+          <i class="fa-solid fa-magnifying-glass text-5xl text-pink-400 mb-4"></i>
+          <h4 class="font-bold text-xl mb-2">2. Browse or Upload</h4>
+          <p class="text-gray-400">Search prompts or upload your own with a price</p>
+        </div>
+        <div class="step-card bg-zinc-900 p-8 rounded-3xl border border-pink-500 text-center">
+          <i class="fa-solid fa-credit-card text-5xl text-pink-400 mb-4"></i>
+          <h4 class="font-bold text-xl mb-2">3. Pay & Unlock</h4>
+          <p class="text-gray-400">Pay in ShelbyUSD — prompt reveals instantly</p>
+        </div>
+        <div class="step-card bg-zinc-900 p-8 rounded-3xl border border-pink-500 text-center">
+          <i class="fa-solid fa-download text-5xl text-pink-400 mb-4"></i>
+          <h4 class="font-bold text-xl mb-2">4. Download + Earn</h4>
+          <p class="text-gray-400">Download .txt + get on-chain proof. Seller gets paid</p>
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- Upload -->
@@ -93,13 +123,12 @@
   </div>
 
   <script>
-    tailwind.config = { content: ["*"], theme: { extend: {} } }
-    let prompts = [ /* same 6 real prompts as before */ 
-      { id: 1, title: "Cinematic Midjourney V6 Prompt", creator: "0xA1B2...C3D4", price: "0.0008", full: "A breathtaking cyberpunk city at night..." },
-      { id: 2, title: "Claude Business Email Template", creator: "0xE5F6...G7H8", price: "0.0005", full: "Write a professional cold email..." },
-      { id: 3, title: "ChatGPT Productivity System", creator: "0xI9J0...K1L2", price: "0.0012", full: "You are now an expert productivity coach..." },
-      { id: 4, title: "Stable Diffusion Anime Style", creator: "0xM3N4...O5P6", price: "0.0007", full: "Beautiful anime girl..." },
-      { id: 5, title: "Gemini Code Generator", creator: "0xQ7R8...S9T0", price: "0.0006", full: "Generate a complete React..." },
+    let prompts = [
+      { id: 1, title: "Cinematic Midjourney V6 Prompt", creator: "0xA1B2...C3D4", price: "0.0008", full: "A breathtaking cyberpunk city at night, neon lights reflecting on wet streets..." },
+      { id: 2, title: "Claude Business Email Template", creator: "0xE5F6...G7H8", price: "0.0005", full: "Write a professional cold email for a SaaS startup targeting Nigerian SMEs..." },
+      { id: 3, title: "ChatGPT Productivity System", creator: "0xI9J0...K1L2", price: "0.0012", full: "You are now an expert productivity coach using the PARA method..." },
+      { id: 4, title: "Stable Diffusion Anime Style", creator: "0xM3N4...O5P6", price: "0.0007", full: "Beautiful anime girl with purple hair, cyberpunk outfit..." },
+      { id: 5, title: "Gemini Code Generator", creator: "0xQ7R8...S9T0", price: "0.0006", full: "Generate a complete React + Tailwind dashboard for..." },
       { id: 6, title: "Llama3 Story Writer", creator: "0xU1V2...W3X4", price: "0.0009", full: "Write a 1000-word sci-fi story about a Nigerian AI inventor..." }
     ];
 
@@ -129,18 +158,62 @@
 
     function filterPrompts() {
       const term = document.getElementById('searchInput').value.toLowerCase();
-      const filtered = prompts.filter(p => 
-        p.title.toLowerCase().includes(term) || p.full.toLowerCase().includes(term)
-      );
+      const filtered = prompts.filter(p => p.title.toLowerCase().includes(term) || p.full.toLowerCase().includes(term));
       renderPrompts(filtered);
     }
 
-    function connectWallet() { /* same as before */ if (walletConnected) return; walletConnected = true; document.getElementById('walletBtn').innerHTML = '✅ Connected'; document.getElementById('walletAddress').classList.remove('hidden'); document.getElementById('walletAddress').textContent = '0x241d...59e8'; alert("✅ Connected to Petra Wallet (Testnet)"); }
-    function openUnlockModal(id) { if (!walletConnected) { alert("Please connect your Petra wallet first!"); return; } currentPrompt = prompts.find(p => p.id === id); document.getElementById('modalTitle').textContent = currentPrompt.title; document.getElementById('modalPrice').innerHTML = `Price: <span class="font-bold">${currentPrompt.price} ShelbyUSD</span>`; document.getElementById('lockedView').classList.remove('hidden'); document.getElementById('unlockedView').classList.add('hidden'); document.getElementById('modal').classList.remove('hidden'); }
-    function simulatePayment() { document.getElementById('lockedView').classList.add('hidden'); document.getElementById('unlockedView').classList.remove('hidden'); document.getElementById('fullPromptText').textContent = currentPrompt.full; }
-    function downloadPrompt() { const blob = new Blob([currentPrompt.full], { type: 'text/plain' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = currentPrompt.title.replace(/[^a-z0-9]/gi, '_') + '.txt'; a.click(); URL.revokeObjectURL(url); alert("✅ Prompt downloaded!"); }
-    function closeModal() { document.getElementById('modal').classList.add('hidden'); }
-    function uploadPrompt() { if (!walletConnected) { alert("Connect wallet first!"); return; } const title = document.getElementById('title').value || "Untitled Prompt"; const price = document.getElementById('price').value || "0.0005"; const full = document.getElementById('fullPrompt').value || "No prompt text added yet."; prompts.unshift({ id: Date.now(), title, creator: "You (Testnet)", price, full }); filterPrompts(); alert("🎉 Prompt uploaded!"); document.getElementById('title').value = ''; document.getElementById('price').value = ''; document.getElementById('fullPrompt').value = ''; }
+    function connectWallet() {
+      if (walletConnected) return;
+      walletConnected = true;
+      document.getElementById('walletBtn').innerHTML = '✅ Connected';
+      document.getElementById('walletAddress').classList.remove('hidden');
+      document.getElementById('walletAddress').textContent = '0x241d...59e8';
+      alert("✅ Connected to Petra Wallet (Testnet)");
+    }
+
+    function openUnlockModal(id) {
+      if (!walletConnected) { alert("Please connect your Petra wallet first!"); return; }
+      currentPrompt = prompts.find(p => p.id === id);
+      document.getElementById('modalTitle').textContent = currentPrompt.title;
+      document.getElementById('modalPrice').innerHTML = `Price: <span class="font-bold">${currentPrompt.price} ShelbyUSD</span>`;
+      document.getElementById('lockedView').classList.remove('hidden');
+      document.getElementById('unlockedView').classList.add('hidden');
+      document.getElementById('modal').classList.remove('hidden');
+    }
+
+    function simulatePayment() {
+      document.getElementById('lockedView').classList.add('hidden');
+      document.getElementById('unlockedView').classList.remove('hidden');
+      document.getElementById('fullPromptText').textContent = currentPrompt.full;
+    }
+
+    function downloadPrompt() {
+      const blob = new Blob([currentPrompt.full], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = currentPrompt.title.replace(/[^a-z0-9]/gi, '_') + '.txt';
+      a.click();
+      URL.revokeObjectURL(url);
+      alert("✅ Prompt downloaded!");
+    }
+
+    function closeModal() {
+      document.getElementById('modal').classList.add('hidden');
+    }
+
+    function uploadPrompt() {
+      if (!walletConnected) { alert("Connect wallet first!"); return; }
+      const title = document.getElementById('title').value || "Untitled Prompt";
+      const price = document.getElementById('price').value || "0.0005";
+      const full = document.getElementById('fullPrompt').value || "No prompt text added yet.";
+      prompts.unshift({ id: Date.now(), title, creator: "You (Testnet)", price, full });
+      filterPrompts();
+      alert("🎉 Prompt uploaded to Shelby Testnet!");
+      document.getElementById('title').value = '';
+      document.getElementById('price').value = '';
+      document.getElementById('fullPrompt').value = '';
+    }
 
     // Initial load
     renderPrompts(prompts);
