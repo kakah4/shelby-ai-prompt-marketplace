@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Shelby AI Prompt Marketplace</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
     body { background: #0a0a0a; color: #fff; }
     .card { transition: all 0.3s; }
@@ -15,26 +16,43 @@
       background-position: center;
       background-attachment: fixed;
     }
-    /* EXACT GLOW + ANIMATION TO MATCH YOUR SCREENSHOT */
-    .shelby-logo {
-      height: 68px;
-      filter: drop-shadow(0 0 10px #ff69b4) 
-              drop-shadow(0 0 25px #ff1493) 
-              drop-shadow(0 0 45px #ec4899) 
-              drop-shadow(0 0 65px #ff1493);
-      animation: neon-glow 3s ease-in-out infinite alternate;
+    /* ULTRA GLOWING LOGO — exactly like your favorite screenshot */
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 14px;
     }
-    @keyframes neon-glow {
-      from { filter: drop-shadow(0 0 8px #ff69b4) drop-shadow(0 0 20px #ff1493); }
-      to   { filter: drop-shadow(0 0 15px #ff69b4) drop-shadow(0 0 35px #ff1493) drop-shadow(0 0 70px #ec4899) drop-shadow(0 0 90px #ff1493); }
+    .robot {
+      font-size: 42px;
+      color: #ff1493;
+      animation: glow-pulse 2.2s ease-in-out infinite alternate;
+      filter: drop-shadow(0 0 15px #ff69b4);
+    }
+    .shelby-text {
+      font-size: 32px;
+      font-weight: 900;
+      color: #ff1493;
+      text-shadow: 
+        0 0 10px #ff69b4,
+        0 0 25px #ff1493,
+        0 0 45px #ec4899,
+        0 0 70px #ff1493;
+      animation: glow-pulse 2.2s ease-in-out infinite alternate;
+    }
+    @keyframes glow-pulse {
+      from { text-shadow: 0 0 8px #ff69b4, 0 0 20px #ff1493; }
+      to   { text-shadow: 0 0 20px #ff69b4, 0 0 45px #ff1493, 0 0 75px #ec4899, 0 0 100px #ff1493; }
     }
   </style>
 </head>
 <body class="font-sans">
-  <!-- Navbar - Your exact glowing logo -->
+  <!-- Navbar — glowing animated logo (no image needed) -->
   <nav class="bg-black border-b border-pink-500 sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-      <img src="shelby-logo.png" alt="Shelby Prompts" class="shelby-logo">
+      <div class="logo-container">
+        <i class="fa-solid fa-robot robot"></i>
+        <span class="shelby-text">Shelby Prompts</span>
+      </div>
       <div class="flex items-center gap-6">
         <button onclick="connectWallet()" id="walletBtn"
           class="bg-pink-600 hover:bg-pink-700 px-6 py-2 rounded-full font-medium flex items-center gap-2">
@@ -45,7 +63,7 @@
     </div>
   </nav>
 
-  <!-- Hero + everything else stays the same -->
+  <!-- The rest of your beautiful site -->
   <section class="hero-bg relative py-32 text-center overflow-hidden">
     <div class="absolute inset-0 bg-black/60"></div>
     <div class="max-w-4xl mx-auto px-6 relative z-10">
@@ -66,10 +84,10 @@
     <div class="max-w-3xl mx-auto px-6">
       <h3 class="text-3xl font-bold mb-8 text-center text-pink-400">Upload Your Prompt & Earn</h3>
       <div class="bg-zinc-900 p-8 rounded-2xl border border-pink-500">
-        <input id="title" type="text" placeholder="Prompt Title (e.g. Epic Midjourney Cinematic)" class="w-full mb-4 px-5 py-4 bg-black rounded-xl border border-gray-700 focus:outline-none focus:border-pink-500 text-white">
-        <input id="price" type="text" placeholder="Price in ShelbyUSD (e.g. 0.0008)" class="w-full mb-4 px-5 py-4 bg-black rounded-xl border border-gray-700 focus:outline-none focus:border-pink-500 text-white">
-        <textarea id="fullPrompt" rows="8" placeholder="Paste your full AI prompt here..." class="w-full mb-6 px-5 py-4 bg-black rounded-xl border border-gray-700 focus:outline-none focus:border-pink-500 text-white"></textarea>
-        <button onclick="uploadPrompt()" class="w-full bg-gradient-to-r from-pink-600 to-pink-500 py-5 rounded-2xl font-bold text-lg hover:scale-105 transition">Upload to Shelby Testnet</button>
+        <input id="title" type="text" placeholder="Prompt Title" class="w-full mb-4 px-5 py-4 bg-black rounded-xl border border-gray-700 focus:outline-none focus:border-pink-500 text-white">
+        <input id="price" type="text" placeholder="Price in ShelbyUSD" class="w-full mb-4 px-5 py-4 bg-black rounded-xl border border-gray-700 focus:outline-none focus:border-pink-500 text-white">
+        <textarea id="fullPrompt" rows="8" placeholder="Paste your full prompt here..." class="w-full mb-6 px-5 py-4 bg-black rounded-xl border border-gray-700 focus:outline-none focus:border-pink-500 text-white"></textarea>
+        <button onclick="uploadPrompt()" class="w-full bg-gradient-to-r from-pink-600 to-pink-500 py-5 rounded-2xl font-bold text-lg">Upload to Shelby Testnet</button>
       </div>
     </div>
   </section>
