@@ -12,27 +12,22 @@
     .neon-text { text-shadow: 0 0 20px #ff00ff, 0 0 40px #00ffff; }
     .hero-bg { background: linear-gradient(135deg, #6b00ff, #ff00aa, #00f0ff); background-size: 300% 300%; animation: gradientShift 12s ease infinite; }
     @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-    .floating { animation: float 3s ease-in-out infinite; }
-    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
     .card { transition: all 0.4s; }
     .card:hover { transform: translateY(-12px) scale(1.03); box-shadow: 0 0 40px rgba(255, 0, 255, 0.6); }
   </style>
 </head>
 <body>
 
-  <!-- NAVBAR -->
+  <!-- NAVBAR (no robot) -->
   <nav class="bg-black/90 backdrop-blur-lg border-b border-white/20 sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
-      <div class="flex items-center gap-3">
-        <i class="fa-solid fa-robot text-4xl text-cyan-400 floating"></i>
-        <span class="text-3xl font-black tracking-tighter neon-text text-white">Shelby Prompts</span>
-      </div>
+      <span class="text-3xl font-black tracking-tighter neon-text">Shelby Prompts</span>
       <button onclick="document.getElementById('marketplace').scrollIntoView({behavior:'smooth'})" 
               class="bg-white text-black font-bold px-8 py-3 rounded-2xl hover:scale-105 transition">Explore Marketplace</button>
     </div>
   </nav>
 
-  <!-- LANDING HERO -->
+  <!-- COLORFUL LANDING HERO -->
   <section class="hero-bg min-h-screen flex items-center relative overflow-hidden">
     <div class="max-w-5xl mx-auto px-6 text-center relative z-10">
       <h1 class="text-6xl md:text-7xl font-black tracking-tighter neon-text mb-6">The Future of AI Prompts is Here</h1>
@@ -41,56 +36,175 @@
       <button onclick="document.getElementById('marketplace').scrollIntoView({behavior:'smooth'})" 
               class="bg-white text-black text-xl font-bold px-12 py-6 rounded-3xl hover:scale-110 transition shadow-2xl">EXPLORE THE MARKETPLACE →</button>
     </div>
-    
-    <!-- Floating decorations -->
-    <div class="absolute top-20 left-10 text-8xl floating">🤖</div>
-    <div class="absolute bottom-32 right-20 text-8xl floating delay-300">✨</div>
   </section>
 
-  <!-- ABOUT SECTION -->
+  <!-- WHY WE BUILT THIS -->
   <section class="py-24 bg-black">
     <div class="max-w-5xl mx-auto px-6">
       <h2 class="text-5xl font-bold text-center mb-16 text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-cyan-400">Why Shelby AI Prompt Marketplace?</h2>
       
       <div class="grid md:grid-cols-2 gap-12">
-        <!-- Problem -->
         <div class="bg-zinc-900 p-10 rounded-3xl border border-pink-500">
           <h3 class="text-3xl font-bold mb-6 text-pink-400">The Problem</h3>
-          <p class="text-lg text-gray-300">AI prompts are scattered across Discord, Reddit and Twitter. Creators can't easily monetize their best work, buyers have no proof of ownership, and everything feels temporary.</p>
+          <p class="text-lg text-gray-300">Great AI prompts are scattered everywhere. Creators can't monetize easily, buyers have no proof of ownership, and nothing feels permanent.</p>
         </div>
-        
-        <!-- Solution -->
         <div class="bg-zinc-900 p-10 rounded-3xl border border-cyan-400">
           <h3 class="text-3xl font-bold mb-6 text-cyan-400">What We Solve</h3>
-          <p class="text-lg text-gray-300">A decentralized marketplace on Shelby Testnet where anyone can upload prompts, set their own price, earn real money, and get cryptographic proof on-chain. Instant download. Real ownership.</p>
+          <p class="text-lg text-gray-300">A real marketplace on Shelby Testnet. Upload your prompts, set your price, earn real money, and give buyers cryptographic proof on-chain. Instant. Secure. Yours forever.</p>
         </div>
-      </div>
-
-      <div class="mt-16 text-center">
-        <p class="text-xl max-w-2xl mx-auto text-gray-300">Built for the AI community — because great prompts deserve to be rewarded, protected, and shared forever on the blockchain.</p>
       </div>
     </div>
   </section>
 
-  <!-- EXPLORE BUTTON -->
-  <div class="text-center py-12 bg-gradient-to-r from-pink-600 to-cyan-500">
-    <button onclick="document.getElementById('marketplace').scrollIntoView({behavior:'smooth'})" 
-            class="text-3xl font-black px-16 py-8 rounded-3xl bg-white text-black hover:scale-110 transition shadow-2xl">EXPLORE THE MARKETPLACE NOW →</button>
-  </div>
+  <!-- MARKETPLACE STARTS HERE -->
+  <section id="marketplace" class="max-w-7xl mx-auto px-6 py-20 bg-black">
+    <!-- Tabs -->
+    <div class="flex border-b border-pink-500 mb-8">
+      <button onclick="switchTab(0)" id="tab0" class="tab-btn active px-8 py-4 text-lg font-medium border-b-2 border-pink-400">Browse Prompts</button>
+      <button onclick="switchTab(1)" id="tab1" class="tab-btn px-8 py-4 text-lg font-medium">My Prompts</button>
+    </div>
 
-  <!-- MARKETPLACE SECTION -->
-  <section id="marketplace" class="max-w-7xl mx-auto px-6 py-20">
-   
+    <!-- Search -->
+    <div class="relative w-full max-w-md mb-8">
+      <input id="searchInput" oninput="filterPrompts()" type="text" placeholder="Search prompts... (try midjourney)" 
+             class="w-full bg-zinc-900 border border-pink-500 rounded-2xl px-6 py-4 text-white focus:outline-none focus:border-pink-400">
+      <i class="fa-solid fa-magnifying-glass absolute right-6 top-1/2 -translate-y-1/2 text-pink-400"></i>
+    </div>
+
+    <!-- Gallery -->
+    <div id="promptGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+    <div id="noResults" class="hidden text-center py-16 text-gray-500 text-lg">No prompts found 😔</div>
+
+    <!-- Upload -->
+    <div class="mt-20 bg-zinc-900 p-10 rounded-3xl border border-pink-500">
+      <h3 class="text-3xl font-bold mb-8 text-center text-pink-400">Upload Your Prompt & Earn</h3>
+      <input id="title" type="text" placeholder="Prompt Title" class="w-full mb-4 px-5 py-4 bg-black rounded-xl border border-gray-700 focus:outline-none focus:border-pink-500 text-white">
+      <input id="price" type="text" placeholder="Price in ShelbyUSD" class="w-full mb-4 px-5 py-4 bg-black rounded-xl border border-gray-700 focus:outline-none focus:border-pink-500 text-white">
+      <textarea id="fullPrompt" rows="8" placeholder="Paste your full prompt here..." class="w-full mb-6 px-5 py-4 bg-black rounded-xl border border-gray-700 focus:outline-none focus:border-pink-500 text-white"></textarea>
+      <button onclick="uploadPrompt()" class="w-full bg-gradient-to-r from-pink-600 to-cyan-500 py-5 rounded-2xl font-bold text-lg">Upload to Shelby Testnet</button>
+    </div>
   </section>
 
-  <!-- (The rest of the marketplace code is included in the full paste - search, My Prompts, download, etc. all still work) -->
+  <footer class="text-center py-12 text-gray-500">Built as beginner proof-of-work • Shelby Testnet • Made with ❤️</footer>
+
+  <!-- Unlock Modal -->
+  <div id="modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+    <div class="bg-zinc-900 max-w-lg w-full mx-4 rounded-3xl p-8">
+      <h4 id="modalTitle" class="text-2xl font-bold mb-4 text-pink-400"></h4>
+      <p id="modalPrice" class="text-pink-400 mb-6"></p>
+      <div id="lockedView"><button onclick="simulatePayment()" class="w-full bg-green-600 py-4 rounded-2xl font-bold text-lg mb-4">Pay & Unlock Now</button></div>
+      <div id="unlockedView" class="hidden">
+        <pre id="fullPromptText" class="bg-black p-6 rounded-2xl text-sm overflow-auto max-h-96 mb-6"></pre>
+        <div class="flex gap-3">
+          <button onclick="downloadPrompt()" class="flex-1 bg-pink-600 hover:bg-pink-700 py-4 rounded-2xl font-bold flex items-center justify-center gap-2"><i class="fa-solid fa-download"></i> Download .txt</button>
+          <button onclick="closeModal()" class="flex-1 bg-gray-700 py-4 rounded-2xl font-bold">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script>
-    // All previous JS (search, tabs, upload, modal, download) is preserved
-    // + new smooth scroll to marketplace
-    let allPrompts = [ /* same 6 prompts as before */ ];
+    let allPrompts = [
+      { id: 1, title: "Cinematic Midjourney V6 Prompt", creator: "0xA1B2...C3D4", price: "0.0008", full: "A breathtaking cyberpunk city at night..." },
+      { id: 2, title: "Claude Business Email Template", creator: "0xE5F6...G7H8", price: "0.0005", full: "Write a professional cold email..." },
+      { id: 3, title: "ChatGPT Productivity System", creator: "0xI9J0...K1L2", price: "0.0012", full: "You are now an expert productivity coach..." },
+      { id: 4, title: "Stable Diffusion Anime Style", creator: "0xM3N4...O5P6", price: "0.0007", full: "Beautiful anime girl..." },
+      { id: 5, title: "Gemini Code Generator", creator: "0xQ7R8...S9T0", price: "0.0006", full: "Generate a complete React..." },
+      { id: 6, title: "Llama3 Story Writer", creator: "0xU1V2...W3X4", price: "0.0009", full: "Write a 1000-word sci-fi story about a Nigerian AI inventor..." }
+    ];
     let myPrompts = [];
-    // ... (full script from previous version is inside the code you paste)
+    let walletConnected = false;
+    let currentPrompt = null;
+    let currentTab = 0;
+
+    function renderPrompts(filtered) {
+      const grid = document.getElementById('promptGrid');
+      const noRes = document.getElementById('noResults');
+      if (filtered.length === 0) {
+        grid.innerHTML = '';
+        noRes.classList.remove('hidden');
+      } else {
+        grid.innerHTML = filtered.map(p => `
+          <div class="card bg-zinc-900 border border-pink-500 rounded-3xl p-6">
+            <h4 class="font-bold text-lg mb-2">${p.title}</h4>
+            <p class="text-xs text-gray-500 mb-4">by ${p.creator}</p>
+            <div class="flex justify-between items-center">
+              <span class="text-pink-400 font-mono">${p.price} ShelbyUSD</span>
+              <button onclick="openUnlockModal(${p.id})" class="bg-pink-600 hover:bg-pink-700 px-6 py-2 rounded-2xl text-sm">Pay to Unlock</button>
+            </div>
+          </div>
+        `).join('');
+        noRes.classList.add('hidden');
+      }
+    }
+
+    function filterPrompts() {
+      const term = document.getElementById('searchInput').value.toLowerCase();
+      const list = currentTab === 0 ? allPrompts : myPrompts;
+      const filtered = list.filter(p => p.title.toLowerCase().includes(term) || p.full.toLowerCase().includes(term));
+      renderPrompts(filtered);
+    }
+
+    function switchTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active border-b-2 border-pink-400', i===tab));
+      filterPrompts();
+    }
+
+    function connectWallet() {
+      if (walletConnected) return;
+      walletConnected = true;
+      alert("✅ Connected to Petra Wallet (Testnet)");
+    }
+
+    function openUnlockModal(id) {
+      if (!walletConnected) { alert("Please connect your Petra wallet first!"); return; }
+      currentPrompt = (currentTab === 0 ? allPrompts : myPrompts).find(p => p.id === id);
+      document.getElementById('modalTitle').textContent = currentPrompt.title;
+      document.getElementById('modalPrice').innerHTML = `Price: <span class="font-bold">${currentPrompt.price} ShelbyUSD</span>`;
+      document.getElementById('lockedView').classList.remove('hidden');
+      document.getElementById('unlockedView').classList.add('hidden');
+      document.getElementById('modal').classList.remove('hidden');
+    }
+
+    function simulatePayment() {
+      document.getElementById('lockedView').classList.add('hidden');
+      document.getElementById('unlockedView').classList.remove('hidden');
+      document.getElementById('fullPromptText').textContent = currentPrompt.full;
+    }
+
+    function downloadPrompt() {
+      const blob = new Blob([currentPrompt.full], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = currentPrompt.title.replace(/[^a-z0-9]/gi, '_') + '.txt';
+      a.click();
+      URL.revokeObjectURL(url);
+      alert("✅ Prompt downloaded!");
+    }
+
+    function closeModal() {
+      document.getElementById('modal').classList.add('hidden');
+    }
+
+    function uploadPrompt() {
+      if (!walletConnected) { alert("Connect wallet first!"); return; }
+      const title = document.getElementById('title').value || "Untitled Prompt";
+      const price = document.getElementById('price').value || "0.0005";
+      const full = document.getElementById('fullPrompt').value || "No prompt text added yet.";
+      const newP = { id: Date.now(), title, creator: "You (Testnet)", price, full };
+      myPrompts.unshift(newP);
+      allPrompts.unshift(newP);
+      filterPrompts();
+      alert("🎉 Prompt uploaded!");
+      document.getElementById('title').value = '';
+      document.getElementById('price').value = '';
+      document.getElementById('fullPrompt').value = '';
+    }
+
+    // Start
+    renderPrompts(allPrompts);
   </script>
 </body>
 </html>
