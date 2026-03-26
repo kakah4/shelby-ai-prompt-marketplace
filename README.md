@@ -1,53 +1,73 @@
-# Shelby AI Prompt Marketplace
+# React + TypeScript + Vite
 
-## Live Demo  
-[https://shelby-ai-prompt-marketplace.vercel.app/](https://shelby-ai-prompt-marketplace.vercel.app/)
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## GitHub Repo  
-https://github.com/kakah4/shelby-ai-prompt-marketplace
+Currently, two official plugins are available:
 
-**Proof of Work** – Built in  March 2026 for Shelby Early Access on Aptos Testnet.
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
-## What it does
-A decentralized marketplace where **anyone** can:
-- Upload their best AI prompts (ChatGPT, Midjourney, Claude, etc.)
-- Set their own price (e.g. 0.0005 ShelbyUSD)
-- Earn money directly when people pay to read the full prompt
-- Every download comes with a cryptographic proof on Aptos
+## React Compiler
 
-No middleman. Real monetization using Shelby's paid reads.
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-## Features (working on testnet)
-- Connect Petra wallet (Aptos Testnet / Shelbynet)
-- Drag-and-drop prompt upload into your own namespace
-- Browse all public prompts (titles free)
-- Pay-to-unlock full prompt + instant verifiable download
-- Creator earnings go straight to their wallet
+## Expanding the ESLint configuration
 
-## Screenshots
-(Will add here after first upload)
+If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
 
-## Tech Stack
-- **Shelby SDK** (@shelby-protocol/sdk + React hooks)
-- Aptos Testnet (Petra wallet + Shelbynet)
-- Next.js / React (simple frontend)
-- Based on official Shelby examples
+```js
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
 
-## Live Demo
-(Will deploy on Vercel once Early Access is approved)
+      // Remove tseslint.configs.recommended and replace with this
+      tseslint.configs.recommendedTypeChecked,
+      // Alternatively, use this for stricter rules
+      tseslint.configs.strictTypeChecked,
+      // Optionally, add this for stylistic rules
+      tseslint.configs.stylisticTypeChecked,
 
-## How to run locally (coming in next commit)
-1. `git clone` this repo
-2. Follow official Shelby quickstart
-3. `pnpm install` + `pnpm dev`
+      // Other configs...
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
+```
 
-## Why I built this
-Shelby is perfect for AI data monetization. This project shows real multi-user paid reads in action.
-## Links
-- Shelby Website: https://shelby.xyz
-- Docs: https://docs.shelby.xyz
-- Official Examples: https://github.com/shelby/examples
-- Quickstart: https://github.com/shelby/shelby-quickstart
-- Discord: discord.gg/shelbyserves
+You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-Built with ❤️ as a novice. Open to feedback from the Shelby team!
+```js
+// eslint.config.js
+import reactX from 'eslint-plugin-react-x'
+import reactDom from 'eslint-plugin-react-dom'
+
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+      // Enable lint rules for React
+      reactX.configs['recommended-typescript'],
+      // Enable lint rules for React DOM
+      reactDom.configs.recommended,
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
+```
