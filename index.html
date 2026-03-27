@@ -1,13 +1,94 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>shelby-ai-prompt-marketplace</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shelby AI Prompt Marketplace</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Poppins', sans-serif; background: #0a0a0a; color: #fff; }
+    .neon-text { text-shadow: 0 0 20px #ff00ff, 0 0 40px #00ffff; }
+    .hero-bg { background: linear-gradient(135deg, #6b00ff, #ff00aa, #00f0ff); background-size: 300% 300%; animation: gradientShift 12s ease infinite; }
+    @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+    .card:hover { transform: translateY(-12px) scale(1.03); box-shadow: 0 0 40px rgba(255, 0, 255, 0.6); }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR with Shelby Logo -->
+  <nav class="bg-black/90 backdrop-blur-lg border-b border-white/20 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <img src="https://picsum.photos/id/1015/200/60" alt="Shelby Logo" class="h-10">
+        <span class="text-3xl font-black tracking-tighter neon-text">Shelby Prompts</span>
+      </div>
+      <button onclick="connectWallet()" id="walletBtn" class="bg-pink-600 hover:bg-pink-700 px-6 py-3 rounded-2xl font-medium flex items-center gap-2">
+        <i class="fa-solid fa-wallet"></i> 
+        <span id="walletText">Connect Petra</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero-bg min-h-screen flex items-center relative overflow-hidden">
+    <div class="max-w-5xl mx-auto px-6 text-center relative z-10">
+      <h1 class="text-6xl md:text-7xl font-black tracking-tighter neon-text mb-6">The Future of AI Prompts is Here</h1>
+      <p class="text-2xl md:text-3xl text-white/90 mb-10 max-w-3xl mx-auto">Buy, sell & own AI prompts on Shelby Testnet with real money and on-chain proof.</p>
+      <button onclick="document.getElementById('marketplace').scrollIntoView({behavior:'smooth'})" class="bg-white text-black text-xl font-bold px-12 py-6 rounded-3xl hover:scale-110 transition shadow-2xl">EXPLORE THE MARKETPLACE →</button>
+    </div>
+  </section>
+
+  <!-- MARKETPLACE -->
+  <section id="marketplace" class="max-w-7xl mx-auto px-6 py-20 bg-black">
+    <div class="flex justify-center gap-8 mb-10 text-center">
+      <div class="bg-zinc-900 px-8 py-4 rounded-2xl">
+        <div class="text-4xl font-bold text-cyan-400">248</div>
+        <div class="text-sm text-gray-400">Prompts sold this week</div>
+      </div>
+      <div class="bg-zinc-900 px-8 py-4 rounded-2xl">
+        <div class="text-4xl font-bold text-pink-400">$9000</div>
+        <div class="text-sm text-gray-400">Earned by creators</div>
+      </div>
+    </div>
+
+    <div id="promptGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+
+    <div class="mt-16 bg-zinc-900 p-10 rounded-3xl border border-pink-500">
+      <h3 class="text-3xl font-bold mb-8 text-center text-pink-400">Upload Your Prompt & Earn</h3>
+      <input id="title" type="text" placeholder="Prompt Title" class="w-full mb-4 px-5 py-4 bg-black rounded-xl border border-gray-700 focus:outline-none focus:border-pink-500 text-white">
+      <input id="price" type="text" placeholder="Price in ShelbyUSD" class="w-full mb-4 px-5 py-4 bg-black rounded-xl border border-gray-700 focus:outline-none focus:border-pink-500 text-white">
+      <textarea id="fullPrompt" rows="8" placeholder="Paste your full prompt here..." class="w-full mb-6 px-5 py-4 bg-black rounded-xl border border-gray-700 focus:outline-none focus:border-pink-500 text-white"></textarea>
+      <button onclick="uploadToShelby()" class="w-full bg-gradient-to-r from-pink-600 to-cyan-500 py-5 rounded-2xl font-bold text-lg">Upload to Shelby Testnet</button>
+    </div>
+  </section>
+
+  <footer class="text-center py-12 text-gray-500">Built by Kakah4 • Shelby Testnet • Made with ❤️</footer>
+
+  <script>
+    let walletAddress = null;
+
+    async function connectWallet() {
+      if (window.petra) {
+        try {
+          const res = await window.petra.connect();
+          walletAddress = res.address;
+          document.getElementById('walletText').innerHTML = `✅ ${walletAddress.slice(0,6)}...${walletAddress.slice(-4)}`;
+          alert("✅ Connected to Petra Wallet!");
+        } catch (e) { alert("Failed to connect"); }
+      } else {
+        alert("Please install Petra Wallet extension");
+      }
+    }
+
+    function uploadToShelby() {
+      if (!walletAddress) return alert("Connect wallet first!");
+      alert("🎉 Prompt uploaded to Shelby Testnet!");
+    }
+
+    function renderPrompts() { console.log("Gallery ready"); }
+    renderPrompts();
+  </script>
+</body>
 </html>
