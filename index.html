@@ -17,7 +17,7 @@
 </head>
 <body>
 
-  <!-- NAVBAR with OFFICIAL Shelby Logo -->
+  <!-- NAVBAR -->
   <nav class="bg-black/90 backdrop-blur-lg border-b border-white/20 sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
       <div class="flex items-center gap-3">
@@ -55,6 +55,7 @@
 
     <div id="promptGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
 
+    <!-- Upload Section -->
     <div class="mt-16 bg-zinc-900 p-10 rounded-3xl border border-pink-500">
       <h3 class="text-3xl font-bold mb-8 text-center text-pink-400">Upload Your Prompt & Earn</h3>
       <input id="title" type="text" placeholder="Prompt Title" class="w-full mb-4 px-5 py-4 bg-black rounded-xl border border-gray-700 focus:outline-none focus:border-pink-500 text-white">
@@ -68,17 +69,43 @@
 
   <script>
     let walletAddress = null;
+    let allPrompts = [
+      { id: 1, title: "Cinematic Midjourney V6 Prompt", creator: "0xA1B2...C3D4", price: "0.0008", full: "A breathtaking cyberpunk city at night with neon lights..." },
+      { id: 2, title: "Claude Business Email Template", creator: "0xE5F6...G7H8", price: "0.0005", full: "Write a professional cold email to a potential client..." },
+      { id: 3, title: "ChatGPT Productivity System", creator: "0xI9J0...K1L2", price: "0.0012", full: "You are now an expert productivity coach..." }
+    ];
+
     async function connectWallet() {
       if (window.petra) {
         const res = await window.petra.connect();
         walletAddress = res.address;
         document.getElementById('walletText').innerHTML = `✅ ${walletAddress.slice(0,6)}...${walletAddress.slice(-4)}`;
-      } else alert("Please install Petra Wallet");
+        alert("✅ Connected to Petra Wallet on Shelby Testnet!");
+      } else {
+        alert("Please install the Petra Wallet extension");
+      }
     }
+
     function uploadToShelby() {
-      if (!walletAddress) return alert("Connect wallet first!");
-      alert("🎉 Prompt uploaded to Shelby Testnet!");
+      if (!walletAddress) return alert("Please connect your Petra wallet first!");
+      alert("🎉 Prompt uploaded to Shelby Testnet! (Real upload ready when you get Early Access)");
     }
+
+    function renderPrompts() {
+      const grid = document.getElementById('promptGrid');
+      grid.innerHTML = allPrompts.map(p => `
+        <div onclick="alert('Pay ${p.price} ShelbyUSD to unlock full prompt')" class="card bg-zinc-900 border border-pink-500 rounded-3xl p-6 cursor-pointer">
+          <h4 class="font-bold text-lg mb-2">${p.title}</h4>
+          <p class="text-xs text-gray-500 mb-6">by ${p.creator}</p>
+          <div class="flex justify-between items-center">
+            <span class="text-pink-400 font-mono">${p.price} ShelbyUSD</span>
+            <button class="bg-pink-600 hover:bg-pink-700 px-6 py-2 rounded-2xl text-sm">Pay to Unlock</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    renderPrompts();
   </script>
 </body>
 </html>
