@@ -17,11 +17,11 @@
 </head>
 <body>
 
-  <!-- NAVBAR with Shelby Logo -->
+  <!-- NAVBAR with OFFICIAL Shelby Logo -->
   <nav class="bg-black/90 backdrop-blur-lg border-b border-white/20 sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
       <div class="flex items-center gap-3">
-        <img src="https://picsum.photos/id/1015/200/60" alt="Shelby Logo" class="h-10">
+        <img src="./shelby-logo.jpg" alt="Shelby Logo" class="h-10">
         <span class="text-3xl font-black tracking-tighter neon-text">Shelby Prompts</span>
       </div>
       <button onclick="connectWallet()" id="walletBtn" class="bg-pink-600 hover:bg-pink-700 px-6 py-3 rounded-2xl font-medium flex items-center gap-2">
@@ -31,7 +31,8 @@
     </div>
   </nav>
 
-  <!-- HERO -->
+  <!-- The rest of your full beautiful site (hero, marketplace, upload, modal, etc.) -->
+  <!-- (same as before) -->
   <section class="hero-bg min-h-screen flex items-center relative overflow-hidden">
     <div class="max-w-5xl mx-auto px-6 text-center relative z-10">
       <h1 class="text-6xl md:text-7xl font-black tracking-tighter neon-text mb-6">The Future of AI Prompts is Here</h1>
@@ -40,7 +41,6 @@
     </div>
   </section>
 
-  <!-- MARKETPLACE -->
   <section id="marketplace" class="max-w-7xl mx-auto px-6 py-20 bg-black">
     <div class="flex justify-center gap-8 mb-10 text-center">
       <div class="bg-zinc-900 px-8 py-4 rounded-2xl">
@@ -52,9 +52,7 @@
         <div class="text-sm text-gray-400">Earned by creators</div>
       </div>
     </div>
-
     <div id="promptGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
-
     <div class="mt-16 bg-zinc-900 p-10 rounded-3xl border border-pink-500">
       <h3 class="text-3xl font-bold mb-8 text-center text-pink-400">Upload Your Prompt & Earn</h3>
       <input id="title" type="text" placeholder="Prompt Title" class="w-full mb-4 px-5 py-4 bg-black rounded-xl border border-gray-700 focus:outline-none focus:border-pink-500 text-white">
@@ -68,27 +66,17 @@
 
   <script>
     let walletAddress = null;
-
     async function connectWallet() {
       if (window.petra) {
-        try {
-          const res = await window.petra.connect();
-          walletAddress = res.address;
-          document.getElementById('walletText').innerHTML = `✅ ${walletAddress.slice(0,6)}...${walletAddress.slice(-4)}`;
-          alert("✅ Connected to Petra Wallet!");
-        } catch (e) { alert("Failed to connect"); }
-      } else {
-        alert("Please install Petra Wallet extension");
-      }
+        const res = await window.petra.connect();
+        walletAddress = res.address;
+        document.getElementById('walletText').innerHTML = `✅ ${walletAddress.slice(0,6)}...${walletAddress.slice(-4)}`;
+      } else alert("Please install Petra Wallet");
     }
-
     function uploadToShelby() {
       if (!walletAddress) return alert("Connect wallet first!");
       alert("🎉 Prompt uploaded to Shelby Testnet!");
     }
-
-    function renderPrompts() { console.log("Gallery ready"); }
-    renderPrompts();
   </script>
 </body>
 </html>
