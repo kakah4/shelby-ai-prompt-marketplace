@@ -3,109 +3,553 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shelby AI Prompt Marketplace</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>PromptoHub — AI Prompt Marketplace</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Poppins', sans-serif; background: #0a0a0a; color: #fff; }
-    .neon-text { text-shadow: 0 0 20px #ff00ff, 0 0 40px #00ffff; }
-    .hero-bg { background: linear-gradient(135deg, #6b00ff, #ff00aa, #00f0ff); background-size: 300% 300%; animation: gradientShift 12s ease infinite; }
-    @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-    .card:hover { transform: translateY(-12px) scale(1.03); box-shadow: 0 0 40px rgba(255, 0, 255, 0.6); }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0a0a0c;
+      --surface:  #111115;
+      --surface2: #18181e;
+      --border:   rgba(255,255,255,0.06);
+      --border2:  rgba(255,255,255,0.11);
+      --text:     #efefef;
+      --muted:    #80808a;
+      --subtle:   #48484f;
+      --accent:   #00d2a0;
+      --accent2:  #00a880;
+      --accentbg: rgba(0,210,160,0.08);
+      --accentbr: rgba(0,210,160,0.25);
+      --green:    #22c55e;
+      --red:      #ef4444;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 3px; }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(10,10,12,0.9); backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 48px; height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; cursor: pointer; }
+    .nav-wordmark { font-size: 17px; font-weight: 800; letter-spacing: -0.02em; color: var(--text); }
+    .nav-wordmark em { font-style: normal; color: var(--accent); }
+    .nav-right { display: flex; align-items: center; gap: 6px; }
+    .nav-link { font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; color: var(--muted); background: none; border: none; padding: 6px 14px; border-radius: 8px; cursor: pointer; transition: color 0.15s, background 0.15s; }
+    .nav-link:hover { color: var(--text); background: var(--surface2); }
+    .btn-connect { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; color: var(--bg); background: var(--accent); border: none; border-radius: 10px; padding: 9px 20px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: background 0.15s, transform 0.1s; }
+    .btn-connect:hover { background: var(--accent2); }
+    .btn-connect:active { transform: scale(0.97); }
+    .btn-connect.connected { background: #15803d; color: #fff; }
+
+    /* ── HERO ── */
+    .hero { max-width: 820px; margin: 0 auto; padding: 96px 48px 80px; text-align: center; }
+
+    .hero-pill {
+      display: inline-flex; align-items: center; gap: 7px;
+      font-size: 12px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
+      color: var(--accent); background: var(--accentbg);
+      border: 1px solid var(--accentbr);
+      padding: 5px 14px; border-radius: 99px; margin-bottom: 32px;
+    }
+    .hero-pill-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{ opacity:1; } 50%{ opacity:0.4; } }
+
+    .hero h1 {
+      font-size: clamp(40px, 7vw, 68px);
+      font-weight: 900; letter-spacing: -0.035em; line-height: 1.06;
+      color: var(--text); margin-bottom: 22px;
+    }
+    .hero h1 .hl {
+      background: linear-gradient(90deg, var(--accent), #60efcb);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .hero p { font-size: 18px; color: var(--muted); max-width: 500px; margin: 0 auto 40px; line-height: 1.7; }
+
+    .hero-ctas { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 60px; }
+    .btn-hero-primary { font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 700; color: var(--bg); background: var(--accent); border: none; border-radius: 12px; padding: 14px 32px; cursor: pointer; transition: background 0.15s, transform 0.1s; }
+    .btn-hero-primary:hover { background: var(--accent2); }
+    .btn-hero-secondary { font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 600; color: var(--text); background: transparent; border: 1px solid var(--border2); border-radius: 12px; padding: 14px 32px; cursor: pointer; transition: background 0.15s; }
+    .btn-hero-secondary:hover { background: var(--surface2); }
+
+    /* ── STATS BAR ── */
+    .stats-bar { display: inline-flex; border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+    .stat { padding: 16px 32px; text-align: center; border-right: 1px solid var(--border); }
+    .stat:last-child { border-right: none; }
+    .stat-n { font-size: 22px; font-weight: 800; color: var(--text); }
+    .stat-n.a { color: var(--accent); }
+    .stat-n.g { color: var(--green); }
+    .stat-l { font-size: 11px; font-weight: 500; letter-spacing: 0.04em; color: var(--subtle); margin-top: 2px; }
+
+    /* ── DIVIDER ── */
+    hr { border: none; border-top: 1px solid var(--border); }
+
+    /* ── SECTION ── */
+    .section { max-width: 1140px; margin: 0 auto; padding: 64px 48px; }
+    .section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; flex-wrap: wrap; gap: 14px; }
+    .section-title { font-size: 20px; font-weight: 700; }
+
+    /* toolbar */
+    .toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .tabs { display: flex; gap: 3px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 3px; }
+    .tab { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; color: var(--muted); background: none; border: none; border-radius: 7px; padding: 7px 16px; cursor: pointer; transition: all 0.15s; }
+    .tab.on { background: var(--surface2); color: var(--text); }
+    .search-box { position: relative; }
+    .search-box i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--subtle); font-size: 12px; pointer-events: none; }
+    .search-input { font-family: 'Inter', sans-serif; font-size: 13px; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 9px 14px 9px 34px; outline: none; width: 230px; transition: border-color 0.15s; }
+    .search-input::placeholder { color: var(--subtle); }
+    .search-input:focus { border-color: var(--accent); }
+
+    /* ── GRID ── */
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 16px; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 24px; cursor: pointer; transition: border-color 0.2s, transform 0.2s; }
+    .card:hover { border-color: var(--accent); transform: translateY(-3px); }
+    .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+    .cat-tag { font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--accent); background: var(--accentbg); border: 1px solid var(--accentbr); padding: 3px 10px; border-radius: 6px; }
+    .card-price { font-size: 13px; font-weight: 700; color: var(--text); white-space: nowrap; }
+    .card-price span { font-size: 11px; font-weight: 400; color: var(--subtle); margin-left: 2px; }
+    .card-title { font-size: 15px; font-weight: 700; line-height: 1.4; margin-bottom: 8px; }
+    .card-preview { font-size: 13px; color: var(--muted); line-height: 1.65; margin-bottom: 20px; }
+    .card-foot { display: flex; justify-content: space-between; align-items: center; }
+    .card-creator { font-size: 12px; color: var(--subtle); }
+    .btn-unlock { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; color: var(--accent); background: var(--accentbg); border: 1px solid var(--accentbr); border-radius: 8px; padding: 7px 14px; cursor: pointer; transition: all 0.15s; }
+    .btn-unlock:hover { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+
+    .empty { text-align: center; padding: 64px; color: var(--subtle); font-size: 15px; display: none; }
+
+    /* ── UPLOAD ── */
+    .upload-wrap { max-width: 660px; margin: 0 auto; padding: 64px 48px; }
+    .upload-card { background: var(--surface); border: 1px solid var(--border); border-radius: 22px; padding: 40px; }
+    .upload-h { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+    .upload-sub { font-size: 14px; color: var(--muted); margin-bottom: 30px; }
+    .field { margin-bottom: 16px; }
+    .field label { display: block; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--subtle); margin-bottom: 7px; }
+    .field input, .field select, .field textarea { font-family: 'Inter', sans-serif; font-size: 14px; color: var(--text); background: var(--bg); border: 1px solid var(--border2); border-radius: 10px; width: 100%; padding: 12px 14px; outline: none; transition: border-color 0.15s; -webkit-appearance: none; }
+    .field input::placeholder, .field textarea::placeholder { color: var(--subtle); }
+    .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent); }
+    .field select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%2380808a' d='M6 8L0 0h12z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 38px; cursor: pointer; }
+    .field select option { background: #18181e; }
+    .field textarea { resize: vertical; min-height: 130px; line-height: 1.65; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .btn-upload { font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 700; width: 100%; padding: 15px; background: var(--accent); color: var(--bg); border: none; border-radius: 12px; cursor: pointer; margin-top: 10px; transition: background 0.15s, transform 0.1s; display: flex; align-items: center; justify-content: center; gap: 9px; }
+    .btn-upload:hover { background: var(--accent2); }
+    .btn-upload:active { transform: scale(0.98); }
+
+    /* ── MODAL ── */
+    .overlay { display: none; position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.82); backdrop-filter: blur(10px); align-items: center; justify-content: center; padding: 20px; }
+    .overlay.open { display: flex; }
+    .modal { background: var(--surface); border: 1px solid var(--border2); border-radius: 22px; width: 100%; max-width: 530px; padding: 36px; position: relative; max-height: 92vh; overflow-y: auto; }
+    .modal-x { position: absolute; top: 20px; right: 20px; background: var(--surface2); border: 1px solid var(--border); color: var(--muted); border-radius: 8px; width: 32px; height: 32px; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; transition: color 0.15s; }
+    .modal-x:hover { color: var(--text); }
+    .modal-cat { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--accent); background: var(--accentbg); border: 1px solid var(--accentbr); padding: 3px 10px; border-radius: 6px; margin-bottom: 14px; }
+    .modal-title { font-size: 21px; font-weight: 800; line-height: 1.25; margin-bottom: 4px; }
+    .modal-meta { font-size: 12px; color: var(--subtle); margin-bottom: 22px; }
+    .price-row { display: flex; align-items: center; justify-content: space-between; background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; margin-bottom: 22px; }
+    .price-label { font-size: 12px; color: var(--muted); }
+    .price-val { font-size: 22px; font-weight: 800; }
+    .price-unit { font-size: 12px; color: var(--subtle); margin-left: 4px; }
+    .btn-pay { font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 700; width: 100%; padding: 15px; background: var(--green); color: #fff; border: none; border-radius: 12px; cursor: pointer; transition: background 0.15s; margin-bottom: 10px; }
+    .btn-pay:hover { background: #16a34a; }
+    .btn-sec { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; width: 100%; padding: 12px; background: transparent; color: var(--muted); border: 1px solid var(--border); border-radius: 12px; cursor: pointer; transition: background 0.15s; }
+    .btn-sec:hover { background: var(--surface2); color: var(--text); }
+    .proof-row { display: flex; align-items: center; gap: 9px; background: rgba(34,197,94,0.07); border: 1px solid rgba(34,197,94,0.2); border-radius: 10px; padding: 11px 16px; margin-bottom: 18px; font-size: 12px; font-weight: 600; color: var(--green); }
+    .prompt-box { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 18px; }
+    .prompt-box pre { font-family: 'Inter', sans-serif; font-size: 13px; color: var(--text); white-space: pre-wrap; line-height: 1.75; }
+    .btn-dl { font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700; width: 100%; padding: 13px; background: var(--surface2); color: var(--text); border: 1px solid var(--border2); border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 10px; transition: all 0.15s; }
+    .btn-dl:hover { border-color: var(--accent); color: var(--accent); background: var(--accentbg); }
+
+    /* ── FOOTER ── */
+    footer { border-top: 1px solid var(--border); padding: 36px 48px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; }
+    .foot-brand { display: flex; align-items: center; gap: 9px; }
+    .foot-wordmark { font-size: 15px; font-weight: 800; letter-spacing: -0.02em; }
+    .foot-wordmark em { font-style: normal; color: var(--accent); }
+    .foot-links { display: flex; gap: 24px; }
+    .foot-link { font-size: 13px; color: var(--subtle); text-decoration: none; transition: color 0.15s; }
+    .foot-link:hover { color: var(--text); }
+    .foot-r { font-size: 12px; color: var(--subtle); }
+
+    /* ── TOAST ── */
+    #toast { position: fixed; bottom: 28px; right: 28px; z-index: 400; background: var(--surface2); border: 1px solid var(--border2); color: var(--text); font-size: 13px; font-weight: 600; padding: 13px 22px; border-radius: 12px; transform: translateY(90px); opacity: 0; transition: all 0.38s cubic-bezier(0.34,1.56,0.64,1); pointer-events: none; }
+    #toast.show { transform: translateY(0); opacity: 1; }
+    #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 399; }
+
+    @media (max-width: 640px) {
+      nav { padding: 0 20px; }
+      .hero { padding: 72px 20px 64px; }
+      .section { padding: 48px 20px; }
+      .upload-wrap { padding: 48px 20px; }
+      footer { padding: 28px 20px; flex-direction: column; align-items: flex-start; }
+      .field-row { grid-template-columns: 1fr; }
+      .nav-link { display: none; }
+      .search-input { width: 150px; }
+      .stats-bar { flex-direction: column; width: 100%; }
+      .stat { border-right: none; border-bottom: 1px solid var(--border); }
+      .stat:last-child { border-bottom: none; }
+    }
   </style>
 </head>
 <body>
 
-  <!-- NAVBAR -->
-  <nav class="bg-black/90 backdrop-blur-lg border-b border-white/20 sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
-      <div class="flex items-center gap-3">
-        <img src="./shelby-logo.jpg" alt="Shelby Logo" class="h-10">
-        <span class="text-3xl font-black tracking-tighter neon-text">Shelby Prompts</span>
+<!-- ══════════════════════════════════════════
+     NAVBAR
+══════════════════════════════════════════ -->
+<nav>
+  <div class="nav-brand" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+    <!-- PromptoHub geometric SVG logo -->
+    <svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="34" height="34" rx="9" fill="#0a0a0c"/>
+      <!-- Outer hexagon ring -->
+      <polygon points="17,3 29,10 29,24 17,31 5,24 5,10"
+        fill="none" stroke="#00d2a0" stroke-width="1.5" stroke-linejoin="round"/>
+      <!-- Inner rotated square -->
+      <rect x="11" y="11" width="12" height="12" rx="2"
+        fill="none" stroke="#00d2a0" stroke-width="1.2"
+        transform="rotate(45 17 17)" opacity="0.55"/>
+      <!-- Center dot -->
+      <circle cx="17" cy="17" r="2.5" fill="#00d2a0"/>
+      <!-- Corner accent lines -->
+      <line x1="17" y1="3" x2="17" y2="7.5" stroke="#00d2a0" stroke-width="1" opacity="0.4"/>
+      <line x1="17" y1="26.5" x2="17" y2="31" stroke="#00d2a0" stroke-width="1" opacity="0.4"/>
+    </svg>
+    <span class="nav-wordmark">Prompto<em>Hub</em></span>
+  </div>
+
+  <div class="nav-right">
+    <button class="nav-link" onclick="document.getElementById('browse').scrollIntoView({behavior:'smooth'})">Browse</button>
+    <button class="nav-link" onclick="document.getElementById('upload').scrollIntoView({behavior:'smooth'})">Upload & Earn</button>
+    <button class="btn-connect" id="walletBtn" onclick="connectWallet()">
+      <i class="fa-solid fa-wallet" style="font-size:11px;"></i>
+      <span id="walletText">Connect Wallet</span>
+    </button>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════
+     HERO
+══════════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-pill">
+    <span class="hero-pill-dot"></span>
+    Live on Shelby Testnet &nbsp;·&nbsp; Aptos
+  </div>
+
+  <h1>Own the prompts<br>that <span class="hl">power AI</span></h1>
+
+  <p>Buy, sell and monetize AI prompts with verifiable on-chain proof. Creators earn directly — no middlemen, no cuts.</p>
+
+  <div class="hero-ctas">
+    <button class="btn-hero-primary" onclick="document.getElementById('browse').scrollIntoView({behavior:'smooth'})">
+      Browse Prompts &nbsp;→
+    </button>
+    <button class="btn-hero-secondary" onclick="document.getElementById('upload').scrollIntoView({behavior:'smooth'})">
+      Start Selling
+    </button>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat"><div class="stat-n">248</div><div class="stat-l">PROMPTS SOLD</div></div>
+    <div class="stat"><div class="stat-n a">$9,200</div><div class="stat-l">CREATOR EARNINGS</div></div>
+    <div class="stat"><div class="stat-n g">100%</div><div class="stat-l">ON-CHAIN VERIFIED</div></div>
+  </div>
+</section>
+
+<hr>
+
+<!-- ══════════════════════════════════════════
+     BROWSE
+══════════════════════════════════════════ -->
+<section class="section" id="browse">
+  <div class="section-head">
+    <h2 class="section-title">Browse Prompts</h2>
+    <div class="toolbar">
+      <div class="tabs">
+        <button class="tab on" id="tab0" onclick="switchTab(0)">All</button>
+        <button class="tab" id="tab1" onclick="switchTab(1)">My Uploads</button>
       </div>
-      <button onclick="connectWallet()" id="walletBtn" class="bg-pink-600 hover:bg-pink-700 px-6 py-3 rounded-2xl font-medium flex items-center gap-2">
-        <i class="fa-solid fa-wallet"></i> 
-        <span id="walletText">Connect Petra</span>
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input class="search-input" id="searchInput" type="text" placeholder="Search prompts…" oninput="filterPrompts()">
+      </div>
+    </div>
+  </div>
+
+  <div class="grid" id="promptGrid"></div>
+  <div class="empty" id="emptyMsg">No prompts found.</div>
+</section>
+
+<hr>
+
+<!-- ══════════════════════════════════════════
+     UPLOAD
+══════════════════════════════════════════ -->
+<div class="upload-wrap" id="upload">
+  <div class="upload-card">
+    <h3 class="upload-h">Upload & Earn</h3>
+    <p class="upload-sub">Connect your Petra wallet, upload a prompt, and earn ShelbyUSD every time someone unlocks it.</p>
+
+    <div class="field">
+      <label>Prompt Title</label>
+      <input id="fTitle" type="text" placeholder="e.g. Cinematic Midjourney V6 City Scene">
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Price (ShelbyUSD)</label>
+        <input id="fPrice" type="text" placeholder="0.001">
+      </div>
+      <div class="field">
+        <label>Category</label>
+        <select id="fCategory">
+          <option>Midjourney</option>
+          <option>ChatGPT</option>
+          <option>Claude</option>
+          <option>Stable Diffusion</option>
+          <option>Gemini</option>
+          <option>Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label>Full Prompt</label>
+      <textarea id="fPrompt" rows="6" placeholder="Paste your full prompt here…"></textarea>
+    </div>
+    <button class="btn-upload" onclick="uploadPrompt()">
+      <i class="fa-solid fa-arrow-up-from-bracket"></i> Upload to Shelby Testnet
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════ -->
+<footer>
+  <div class="foot-brand">
+    <svg width="26" height="26" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="34" height="34" rx="9" fill="#111115"/>
+      <polygon points="17,3 29,10 29,24 17,31 5,24 5,10" fill="none" stroke="#00d2a0" stroke-width="1.5" stroke-linejoin="round"/>
+      <rect x="11" y="11" width="12" height="12" rx="2" fill="none" stroke="#00d2a0" stroke-width="1.2" transform="rotate(45 17 17)" opacity="0.55"/>
+      <circle cx="17" cy="17" r="2.5" fill="#00d2a0"/>
+    </svg>
+    <span class="foot-wordmark">Prompto<em>Hub</em></span>
+  </div>
+
+  <div class="foot-links">
+    <a class="foot-link" href="https://shelby.xyz" target="_blank">shelby.xyz</a>
+    <a class="foot-link" href="https://github.com/kakah4/shelby-ai-prompt-marketplace" target="_blank">GitHub</a>
+    <a class="foot-link" href="https://discord.gg/shelbyserves" target="_blank">Discord</a>
+  </div>
+
+  <span class="foot-r">Built by Kakah4 · Shelby Testnet · Aptos</span>
+</footer>
+
+<!-- ══════════════════════════════════════════
+     MODAL
+══════════════════════════════════════════ -->
+<div class="overlay" id="modal">
+  <div class="modal">
+    <button class="modal-x" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+
+    <!-- Locked -->
+    <div id="lockedView">
+      <div class="modal-cat" id="mCat"></div>
+      <h4 class="modal-title" id="mTitle"></h4>
+      <p class="modal-meta" id="mMeta"></p>
+      <div class="price-row">
+        <span class="price-label">Price to unlock</span>
+        <div><span class="price-val" id="mPrice"></span><span class="price-unit">ShelbyUSD</span></div>
+      </div>
+      <button class="btn-pay" onclick="doPayment()">
+        <i class="fa-solid fa-lock-open" style="margin-right:8px;"></i>Pay & Unlock
       </button>
+      <button class="btn-sec" onclick="closeModal()">Cancel</button>
     </div>
-  </nav>
 
-  <!-- HERO -->
-  <section class="hero-bg min-h-screen flex items-center relative overflow-hidden">
-    <div class="max-w-5xl mx-auto px-6 text-center relative z-10">
-      <h1 class="text-6xl md:text-7xl font-black tracking-tighter neon-text mb-6">The Future of AI Prompts is Here</h1>
-      <p class="text-2xl md:text-3xl text-white/90 mb-10 max-w-3xl mx-auto">Buy, sell & own AI prompts on Shelby Testnet with real money and on-chain proof.</p>
-      <button onclick="document.getElementById('marketplace').scrollIntoView({behavior:'smooth'})" class="bg-white text-black text-xl font-bold px-12 py-6 rounded-3xl hover:scale-110 transition shadow-2xl">EXPLORE THE MARKETPLACE →</button>
-    </div>
-  </section>
-
-  <!-- MARKETPLACE -->
-  <section id="marketplace" class="max-w-7xl mx-auto px-6 py-20 bg-black">
-    <div class="flex justify-center gap-8 mb-10 text-center">
-      <div class="bg-zinc-900 px-8 py-4 rounded-2xl">
-        <div class="text-4xl font-bold text-cyan-400">248</div>
-        <div class="text-sm text-gray-400">Prompts sold this week</div>
+    <!-- Unlocked -->
+    <div id="unlockedView" style="display:none;">
+      <div class="modal-cat" id="mCatU"></div>
+      <h4 class="modal-title" id="mTitleU" style="margin-bottom:18px;"></h4>
+      <div class="proof-row">
+        <i class="fa-solid fa-shield-check"></i>
+        On-chain proof recorded · Shelby Testnet · Aptos
       </div>
-      <div class="bg-zinc-900 px-8 py-4 rounded-2xl">
-        <div class="text-4xl font-bold text-pink-400">$9000</div>
-        <div class="text-sm text-gray-400">Earned by creators</div>
-      </div>
+      <div class="prompt-box"><pre id="mFullText"></pre></div>
+      <button class="btn-dl" onclick="doDownload()">
+        <i class="fa-solid fa-download"></i> Download .txt
+      </button>
+      <button class="btn-sec" onclick="closeModal()">Close</button>
     </div>
+  </div>
+</div>
 
-    <div id="promptGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+<div id="toast"></div>
+<canvas id="confetti"></canvas>
 
-    <!-- Upload Section -->
-    <div class="mt-16 bg-zinc-900 p-10 rounded-3xl border border-pink-500">
-      <h3 class="text-3xl font-bold mb-8 text-center text-pink-400">Upload Your Prompt & Earn</h3>
-      <input id="title" type="text" placeholder="Prompt Title" class="w-full mb-4 px-5 py-4 bg-black rounded-xl border border-gray-700 focus:outline-none focus:border-pink-500 text-white">
-      <input id="price" type="text" placeholder="Price in ShelbyUSD" class="w-full mb-4 px-5 py-4 bg-black rounded-xl border border-gray-700 focus:outline-none focus:border-pink-500 text-white">
-      <textarea id="fullPrompt" rows="8" placeholder="Paste your full prompt here..." class="w-full mb-6 px-5 py-4 bg-black rounded-xl border border-gray-700 focus:outline-none focus:border-pink-500 text-white"></textarea>
-      <button onclick="uploadToShelby()" class="w-full bg-gradient-to-r from-pink-600 to-cyan-500 py-5 rounded-2xl font-bold text-lg">Upload to Shelby Testnet</button>
-    </div>
-  </section>
+<!-- ══════════════════════════════════════════
+     SCRIPT
+══════════════════════════════════════════ -->
+<script>
+  var wallet = null, tab = 0, active = null;
 
-  <footer class="text-center py-12 text-gray-500">Built by Kakah4 • Shelby Testnet • Made with ❤️</footer>
+  var prompts = [
+    { id:1, cat:'Midjourney',       title:'Cinematic Midjourney V6 Prompt',     by:'0xA1B2...C3D4', price:'0.0008', prev:'A breathtaking cyberpunk cityscape at night, neon signs reflected in wet streets, flying cars…', full:'A breathtaking cyberpunk city at night, neon signs reflected in wet streets, flying cars weaving between glass skyscrapers, ultra-detailed, cinematic lighting, 8k, shot on RED camera --ar 16:9 --v 6 --style raw' },
+    { id:2, cat:'Claude',           title:'Cold Email Master Template',          by:'0xE5F6...G7H8', price:'0.0005', prev:'Expert business communicator prompt. Write concise, compelling cold emails that convert…',       full:'You are an expert business communicator. Write a concise, compelling cold email to [TARGET] at [COMPANY] about [PRODUCT]. Open with a personalized hook, state the value in one sentence, include social proof, end with a low-commitment CTA. Under 150 words. Tone: confident but not pushy.' },
+    { id:3, cat:'ChatGPT',          title:'Deep Work Productivity System',       by:'0xI9J0...K1L2', price:'0.0012', prev:'Elite productivity coach trained in GTD, time-blocking and deep work. Identifies bottlenecks…',   full:'You are an elite productivity coach trained in GTD, time-blocking, and deep work. I will describe my goals and workload. 1) Identify my top 3 bottlenecks. 2) Design a weekly time-block schedule. 3) Suggest one keystone habit for this month. 4) Give a 30-day accountability framework. Ask clarifying questions first.' },
+    { id:4, cat:'Stable Diffusion', title:'Anime Portrait — Cyberpunk Style',   by:'0xM3N4...O5P6', price:'0.0007', prev:'Beautiful anime character, silver hair, glowing violet eyes, futuristic cyberpunk neon Tokyo…',    full:'beautiful anime girl, long silver hair, glowing violet eyes, futuristic cyberpunk outfit, neon Tokyo street background, masterpiece, best quality, ultra-detailed, 8k, sharp focus, studio lighting, trending artstation, by wlop and ilya kuvshinov --neg lowres, bad anatomy, bad hands, worst quality' },
+    { id:5, cat:'ChatGPT',          title:'React Component Code Generator',     by:'0xQ7R8...S9T0', price:'0.0006', prev:'Generate production-ready React components with TypeScript, Tailwind CSS and full accessibility…',  full:'Generate a production-ready React component for [FEATURE]. Requirements: TypeScript, Tailwind CSS, WCAG AA accessible, mobile-first, no extra dependencies. Include TypeScript interfaces, error boundary, loading/empty states, unit test stubs, and JSDoc for all props. Output the component file only.' },
+    { id:6, cat:'Claude',           title:'Afrofuturist Sci-Fi Story Writer',   by:'0xU1V2...W3X4', price:'0.0009', prev:'1200-word sci-fi set in Lagos 2087. First person, present tense, afrofuturist aesthetic…',         full:'Write a 1200-word sci-fi story set in Lagos, Nigeria in 2087. Protagonist: Amara Osei, 28-year-old AI engineer who discovers her consciousness was secretly uploaded to a government supercomputer. Structure: inciting incident (300w), rising tension (500w), twist (200w), open ending (200w). Voice: literary fiction, first person present, afrofuturist.' },
+  ];
+  var mine = [];
 
-  <script>
-    let walletAddress = null;
-    let allPrompts = [
-      { id: 1, title: "Cinematic Midjourney V6 Prompt", creator: "0xA1B2...C3D4", price: "0.0008", full: "A breathtaking cyberpunk city at night with neon lights..." },
-      { id: 2, title: "Claude Business Email Template", creator: "0xE5F6...G7H8", price: "0.0005", full: "Write a professional cold email to a potential client..." },
-      { id: 3, title: "ChatGPT Productivity System", creator: "0xI9J0...K1L2", price: "0.0012", full: "You are now an expert productivity coach..." }
-    ];
-
-    async function connectWallet() {
-      if (window.petra) {
-        const res = await window.petra.connect();
-        walletAddress = res.address;
-        document.getElementById('walletText').innerHTML = `✅ ${walletAddress.slice(0,6)}...${walletAddress.slice(-4)}`;
-        alert("✅ Connected to Petra Wallet on Shelby Testnet!");
-      } else {
-        alert("Please install the Petra Wallet extension");
+  /* ── WALLET ── */
+  async function connectWallet() {
+    if (wallet) { toast('Already connected: ' + wallet.slice(0,8) + '…'); return; }
+    if (!window.petra) {
+      if (confirm('Petra Wallet not detected.\n\nClick OK to install it, then come back and connect.')) {
+        window.open('https://chromewebstore.google.com/detail/petra-wallet/ejjladinnckdgjemekhnmkkejmbnaflb','_blank');
       }
+      return;
     }
-
-    function uploadToShelby() {
-      if (!walletAddress) return alert("Please connect your Petra wallet first!");
-      alert("🎉 Prompt uploaded to Shelby Testnet! (Real upload ready when you get Early Access)");
+    try {
+      var r = await window.petra.connect();
+      wallet = r.address;
+      document.getElementById('walletBtn').classList.add('connected');
+      document.getElementById('walletText').textContent = wallet.slice(0,6)+'…'+wallet.slice(-4);
+      toast('Connected: ' + wallet.slice(0,8) + '…');
+    } catch(e) {
+      toast(e.code===4001 ? 'Connection cancelled.' : 'Could not connect. Set Petra to Shelby Testnet.');
     }
+  }
 
-    function renderPrompts() {
-      const grid = document.getElementById('promptGrid');
-      grid.innerHTML = allPrompts.map(p => `
-        <div onclick="alert('Pay ${p.price} ShelbyUSD to unlock full prompt')" class="card bg-zinc-900 border border-pink-500 rounded-3xl p-6 cursor-pointer">
-          <h4 class="font-bold text-lg mb-2">${p.title}</h4>
-          <p class="text-xs text-gray-500 mb-6">by ${p.creator}</p>
-          <div class="flex justify-between items-center">
-            <span class="text-pink-400 font-mono">${p.price} ShelbyUSD</span>
-            <button class="bg-pink-600 hover:bg-pink-700 px-6 py-2 rounded-2xl text-sm">Pay to Unlock</button>
-          </div>
-        </div>
-      `).join('');
-    }
+  async function tryAuto() {
+    if (!window.petra) return;
+    try {
+      if (await window.petra.isConnected()) {
+        var a = await window.petra.account();
+        wallet = a.address;
+        document.getElementById('walletBtn').classList.add('connected');
+        document.getElementById('walletText').textContent = wallet.slice(0,6)+'…'+wallet.slice(-4);
+      }
+    } catch(e) {}
+  }
 
-    renderPrompts();
-  </script>
+  /* ── UPLOAD ── */
+  function uploadPrompt() {
+    if (!wallet) { toast('Connect your wallet first.'); return; }
+    var t = (document.getElementById('fTitle').value||'').trim();
+    var p = (document.getElementById('fPrice').value||'0.001').trim();
+    var c = document.getElementById('fCategory').value;
+    var f = (document.getElementById('fPrompt').value||'').trim();
+    if (!t) { toast('Please enter a title.'); return; }
+    if (!f) { toast('Please paste your prompt.'); return; }
+    var obj = { id:Date.now(), cat:c, title:t, by:wallet.slice(0,6)+'…'+wallet.slice(-4), price:p, prev:f.slice(0,90)+'…', full:f };
+    mine.unshift(obj); prompts.unshift(obj);
+    ['fTitle','fPrice','fPrompt'].forEach(function(id){ document.getElementById(id).value=''; });
+    render(tab===0 ? prompts : mine);
+    confetti(); toast('Uploaded to Shelby Testnet!');
+    document.getElementById('browse').scrollIntoView({behavior:'smooth'});
+  }
+
+  /* ── MODAL ── */
+  function openCard(id) {
+    var src = tab===0 ? prompts : mine;
+    active = src.find(function(p){return p.id===id;});
+    if (!active) return;
+    document.getElementById('mCat').textContent   = active.cat;
+    document.getElementById('mTitle').textContent = active.title;
+    document.getElementById('mMeta').textContent  = 'by ' + active.by;
+    document.getElementById('mPrice').textContent = active.price;
+    document.getElementById('lockedView').style.display   = '';
+    document.getElementById('unlockedView').style.display = 'none';
+    document.getElementById('modal').classList.add('open');
+  }
+
+  function doPayment() {
+    if (!wallet) { closeModal(); toast('Connect your wallet first, then try again.'); return; }
+    document.getElementById('mCatU').textContent    = active.cat;
+    document.getElementById('mTitleU').textContent  = active.title;
+    document.getElementById('mFullText').textContent = active.full;
+    document.getElementById('lockedView').style.display   = 'none';
+    document.getElementById('unlockedView').style.display = '';
+    toast('Payment confirmed · Proof recorded on Aptos');
+  }
+
+  function doDownload() {
+    if (!active) return;
+    var blob = new Blob([active.full], {type:'text/plain'});
+    var url  = URL.createObjectURL(blob);
+    var a    = document.createElement('a');
+    a.href   = url; a.download = active.title.replace(/[^a-z0-9]/gi,'_').toLowerCase()+'.txt'; a.click();
+    URL.revokeObjectURL(url); confetti();
+  }
+
+  function closeModal() { document.getElementById('modal').classList.remove('open'); }
+  document.getElementById('modal').addEventListener('click', function(e){ if(e.target===this) closeModal(); });
+
+  /* ── RENDER ── */
+  function render(list) {
+    var g = document.getElementById('promptGrid');
+    var e = document.getElementById('emptyMsg');
+    if (!list.length) { g.innerHTML=''; e.style.display='block'; return; }
+    e.style.display='none';
+    g.innerHTML = list.map(function(p){
+      return '<div class="card" onclick="openCard('+p.id+')">'
+        +'<div class="card-top"><span class="cat-tag">'+p.cat+'</span><span class="card-price">'+p.price+'<span>ShelbyUSD</span></span></div>'
+        +'<div class="card-title">'+p.title+'</div>'
+        +'<div class="card-preview">'+p.prev+'</div>'
+        +'<div class="card-foot"><span class="card-creator">by '+p.by+'</span><button class="btn-unlock">Unlock</button></div>'
+        +'</div>';
+    }).join('');
+  }
+
+  function switchTab(t) {
+    tab = t;
+    document.querySelectorAll('.tab').forEach(function(b,i){ b.classList.toggle('on',i===t); });
+    filterPrompts();
+  }
+
+  function filterPrompts() {
+    var q = document.getElementById('searchInput').value.toLowerCase();
+    var s = tab===0 ? prompts : mine;
+    render(q ? s.filter(function(p){ return p.title.toLowerCase().includes(q)||p.cat.toLowerCase().includes(q)||p.full.toLowerCase().includes(q); }) : s);
+  }
+
+  /* ── TOAST ── */
+  var tt;
+  function toast(msg) {
+    var el = document.getElementById('toast');
+    el.textContent = msg; el.classList.add('show');
+    clearTimeout(tt); tt = setTimeout(function(){ el.classList.remove('show'); }, 3000);
+  }
+
+  /* ── CONFETTI ── */
+  function confetti() {
+    var c = document.getElementById('confetti'), x = c.getContext('2d');
+    c.width = window.innerWidth; c.height = window.innerHeight;
+    var cols = ['#00d2a0','#60efcb','#a78bfa','#60a5fa','#f472b6'];
+    var pts = Array.from({length:160},function(){
+      return {x:Math.random()*c.width,y:Math.random()*c.height-c.height,col:cols[Math.floor(Math.random()*cols.length)],s:Math.random()*7+3,sp:Math.random()*5+3,d:(Math.random()-.5)*2};
+    });
+    var f=0;
+    (function draw(){
+      x.clearRect(0,0,c.width,c.height);
+      pts.forEach(function(p){p.y+=p.sp;p.x+=p.d;x.fillStyle=p.col;x.globalAlpha=0.9;x.fillRect(p.x,p.y,p.s,p.s);});
+      x.globalAlpha=1; f++;
+      if(f<110) requestAnimationFrame(draw);
+      else x.clearRect(0,0,c.width,c.height);
+    })();
+  }
+
+  render(prompts);
+  tryAuto();
+</script>
 </body>
 </html>
