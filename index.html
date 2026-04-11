@@ -155,7 +155,7 @@
     .foot-link:hover { color: var(--text); }
     .foot-r { font-size: 12px; color: var(--subtle); }
 
-    #toast { position: fixed; bottom: 28px; right: 28px; z-index: 400; background: var(--text); color: #fff; font-size: 13px; font-weight: 600; padding: 13px 22px; border-radius: 12px; transform: translateY(90px); opacity: 0; transition: all 0.38s cubic-bezier(0.34,1.56,0.64,1); pointer-events: none; max-width: 400px; word-break: break-word; }
+    #toast { position: fixed; bottom: 28px; right: 28px; z-index: 400; background: var(--text); color: #fff; font-size: 13px; font-weight: 600; padding: 13px 22px; border-radius: 12px; transform: translateY(90px); opacity: 0; transition: all 0.38s cubic-bezier(0.34,1.56,0.64,1); pointer-events: none; max-width: 420px; word-break: break-word; }
     #toast.show { transform: translateY(0); opacity: 1; }
 
     @media (max-width: 640px) {
@@ -339,6 +339,9 @@
 
 <div id="toast"></div>
 
+<!-- AIP-62 Wallet Standard -->
+<script src="https://unpkg.com/@aptos-labs/wallet-standard@latest/dist/browser/index.global.js"></script>
+
 <script>
   var wallet = null, currentTab = 0, activeCat = '', active = null;
 
@@ -352,51 +355,65 @@
   ];
   var mine = [];
 
-  // ── Wallet using AIP-62 standard ──────────────────────────────────
-  function getPetraWallet() {
-    // Try new standard first
-    if (window.aptos) return window.aptos;
-    // Fallback to window.petra
-    if (window.petra) return window.petra;
+  // ── Wallet using AIP-62 getAptosWallets ───────────────────────────
+  function getPetra() {
+    try {
+      var getAptosWallets = window.aptosWalletStandard && window.aptosWalletStandard.getAptosWallets
+        ? window.aptosWalletStandard.getAptosWallets
+        : (window.getAptosWallets || null);
+      if (getAptosWallets) {
+        var result = getAptosWallets();
+        var wallets = result.aptosWallets || result || [];
+        for (var i = 0; i < wallets.length; i++) {
+          if (wallets[i].name && wallets[i].name.toLowerCase().includes('petra')) {
+            return wallets[i];
+          }
+        }
+      }
+    } catch(e) {}
     return null;
-  }
-
-  function addrStr(addr) {
-    if (!addr) return '';
-    if (typeof addr === 'string') return addr;
-    if (addr.toString) return addr.toString();
-    return String(addr);
   }
 
   async function connectWallet() {
     if (wallet) { toast('Already connected: ' + wallet.slice(0,6) + '…' + wallet.slice(-4)); return; }
-    var petra = getPetraWallet();
+    var petra = getPetra();
     if (!petra) {
       if (confirm('Petra Wallet not detected.\n\nClick OK to install it, then come back and connect.')) {
-        window.open('https://chromewebstore.google.com/detail/petra-wallet/ejjladinnckdgjemekhnmkkejmbnaflb','_blank');
+        window.open('https://chromewebstore.google.com/detail/petra-aptos-wallet/ejjladinnckdgjemekebdpeokbikhfci','_blank');
       }
       return;
     }
     try {
-      var r = await petra.connect();
-      wallet = addrStr(r.address);
+      var connectFn = petra.features && petra.features['aptos:connect']
+        ? petra.features['aptos:connect'].connect
+        : petra.connect;
+      if (!connectFn) { toast('Connect feature not found in Petra.'); return; }
+      var result = await connectFn();
+      var accounts = result.accounts || [result];
+      var addr = accounts[0] && accounts[0].address
+        ? accounts[0].address.toString()
+        : (typeof result.address === 'string' ? result.address : result.address.toString());
+      wallet = addr;
       document.getElementById('walletBtn').classList.add('connected');
       document.getElementById('walletText').textContent = wallet.slice(0,6)+'…'+wallet.slice(-4);
       toast('✓ Connected: ' + wallet.slice(0,6) + '…' + wallet.slice(-4));
     } catch(e) {
       if (e && e.code === 4001) { toast('Connection cancelled.'); return; }
-      toast('Could not connect: ' + (e && e.message ? e.message.slice(0,60) : JSON.stringify(e).slice(0,60)));
+      toast('Error: ' + (e && e.message ? e.message.slice(0,80) : JSON.stringify(e).slice(0,80)));
     }
   }
 
   async function tryAuto() {
-    var petra = getPetraWallet();
+    var petra = getPetra();
     if (!petra) return;
     try {
-      var connected = await petra.isConnected();
-      if (connected) {
-        var a = await petra.account();
-        wallet = addrStr(a.address);
+      var accountFn = petra.features && petra.features['aptos:account']
+        ? petra.features['aptos:account'].account
+        : petra.account;
+      if (!accountFn) return;
+      var result = await accountFn();
+      if (result && result.address) {
+        wallet = result.address.toString();
         document.getElementById('walletBtn').classList.add('connected');
         document.getElementById('walletText').textContent = wallet.slice(0,6)+'…'+wallet.slice(-4);
       }
@@ -499,7 +516,8 @@
   }
 
   render(prompts);
-  tryAuto();
+  // Small delay to let wallet standard load
+  setTimeout(tryAuto, 500);
 </script>
 </body>
 </html>
