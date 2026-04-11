@@ -50,83 +50,35 @@
     .btn-connect.connected { background: #0d7a4e; }
 
     /* HERO */
-    .hero {
-      position: relative; min-height: 100vh;
-      display: flex; align-items: center; justify-content: center;
-      overflow: hidden;
-    }
+    .hero { position: relative; min-height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
     .hero-video-wrap { position: absolute; inset: 0; z-index: 0; }
-    .hero-video-wrap video {
-      width: 100%; height: 100%; object-fit: cover;
-      filter: brightness(0.3) saturate(0.7);
-    }
-    .hero-overlay {
-      position: absolute; inset: 0; z-index: 1;
-      background: linear-gradient(to bottom,
-        rgba(255,255,255,0) 0%,
-        rgba(255,255,255,0.05) 55%,
-        rgba(255,255,255,1) 100%);
-    }
-    .hero-glow {
-      position: absolute; z-index: 1;
-      width: 700px; height: 700px; border-radius: 50%;
-      background: radial-gradient(circle, rgba(255,45,120,0.2) 0%, transparent 70%);
-      top: 50%; left: 50%; transform: translate(-50%, -60%);
-      pointer-events: none;
-    }
-    .hero-content {
-      position: relative; z-index: 2;
-      max-width: 900px; margin: 0 auto; text-align: center;
-      padding: 120px 48px 140px;
-    }
-    .hero-pill {
-      display: inline-flex; align-items: center; gap: 8px;
-      font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
-      color: #ffaecb; background: rgba(255,45,120,0.12);
-      border: 1px solid rgba(255,45,120,0.3);
-      padding: 6px 16px; border-radius: 99px; margin-bottom: 32px;
-      backdrop-filter: blur(10px);
-    }
+    .hero-video-wrap video { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.3) saturate(0.7); }
+    .hero-overlay { position: absolute; inset: 0; z-index: 1; background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.05) 55%, rgba(255,255,255,1) 100%); }
+    .hero-glow { position: absolute; z-index: 1; width: 700px; height: 700px; border-radius: 50%; background: radial-gradient(circle, rgba(255,45,120,0.2) 0%, transparent 70%); top: 50%; left: 50%; transform: translate(-50%, -60%); pointer-events: none; }
+    .hero-content { position: relative; z-index: 2; max-width: 900px; margin: 0 auto; text-align: center; padding: 120px 48px 140px; }
+    .hero-pill { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #ffaecb; background: rgba(255,45,120,0.12); border: 1px solid rgba(255,45,120,0.3); padding: 6px 16px; border-radius: 99px; margin-bottom: 32px; backdrop-filter: blur(10px); }
     .hero-pill-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--pink); animation: pulse 2s infinite; }
     @keyframes pulse { 0%,100%{ opacity:1; } 50%{ opacity:0.4; } }
-
-    .hero h1 {
-      font-family: 'Syne', sans-serif;
-      font-size: clamp(46px, 8vw, 84px);
-      font-weight: 800; letter-spacing: -0.04em; line-height: 1.04;
-      color: #fff; margin-bottom: 24px;
-    }
-    .hero h1 .hl {
-      background: linear-gradient(90deg, var(--pink), #ff9cc8);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-    }
+    .hero h1 { font-family: 'Syne', sans-serif; font-size: clamp(46px, 8vw, 84px); font-weight: 800; letter-spacing: -0.04em; line-height: 1.04; color: #fff; margin-bottom: 24px; }
+    .hero h1 .hl { background: linear-gradient(90deg, var(--pink), #ff9cc8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
     .hero p { font-size: 18px; color: rgba(255,255,255,0.6); max-width: 480px; margin: 0 auto 44px; line-height: 1.75; font-weight: 300; }
-
     .hero-ctas { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 72px; }
     .btn-hero-p { font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; color: #fff; background: var(--pink); border: none; border-radius: 12px; padding: 14px 32px; cursor: pointer; transition: transform 0.15s, background 0.15s; box-shadow: 0 0 32px rgba(255,45,120,0.4); }
     .btn-hero-p:hover { background: var(--pink2); transform: translateY(-1px); }
     .btn-hero-s { font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500; color: #fff; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.22); border-radius: 12px; padding: 14px 32px; cursor: pointer; backdrop-filter: blur(10px); transition: background 0.15s; }
     .btn-hero-s:hover { background: rgba(255,255,255,0.18); }
-
-    .stats-bar {
-      display: inline-flex; border: 1px solid rgba(255,45,120,0.2); border-radius: 16px;
-      overflow: hidden; background: rgba(255,255,255,0.08); backdrop-filter: blur(16px);
-    }
+    .stats-bar { display: inline-flex; border: 1px solid rgba(255,45,120,0.2); border-radius: 16px; overflow: hidden; background: rgba(255,255,255,0.08); backdrop-filter: blur(16px); }
     .stat { padding: 16px 32px; text-align: center; border-right: 1px solid rgba(255,45,120,0.15); }
     .stat:last-child { border-right: none; }
     .stat-n { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; color: #fff; }
     .stat-n.p { color: #ff9cc8; }
     .stat-l { font-size: 11px; font-weight: 500; letter-spacing: 0.05em; color: rgba(255,255,255,0.4); margin-top: 2px; }
 
-    /* DIVIDER */
     hr { border: none; border-top: 1px solid var(--border); }
 
-    /* SECTION */
     .section { max-width: 1140px; margin: 0 auto; padding: 80px 48px; }
     .section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; flex-wrap: wrap; gap: 14px; }
     .section-title { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
-
-    /* TOOLBAR */
     .toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     .tabs { display: flex; gap: 3px; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 3px; }
     .tab { font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; color: var(--muted); background: none; border: none; border-radius: 7px; padding: 7px 16px; cursor: pointer; transition: all 0.15s; }
@@ -135,18 +87,11 @@
     .search-box i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--subtle); font-size: 12px; pointer-events: none; }
     .search-input { font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text); background: #fff; border: 1px solid var(--border2); border-radius: 10px; padding: 9px 14px 9px 34px; outline: none; width: 230px; transition: border-color 0.15s; }
     .search-input:focus { border-color: var(--pink); }
-
-    /* CATEGORIES */
     .cats { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 28px; }
     .cat-btn { font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; color: var(--muted); background: #fff; border: 1px solid var(--border2); border-radius: 8px; padding: 6px 14px; cursor: pointer; transition: all 0.15s; }
     .cat-btn:hover, .cat-btn.on { color: var(--pink); background: var(--pinkbg); border-color: var(--pinkbr); }
-
-    /* GRID */
     .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
-    .card {
-      background: #fff; border: 1px solid var(--border); border-radius: 18px; padding: 26px;
-      cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
-    }
+    .card { background: #fff; border: 1px solid var(--border); border-radius: 18px; padding: 26px; cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s; }
     .card:hover { border-color: var(--pinkbr); box-shadow: 0 8px 40px rgba(255,45,120,0.08); transform: translateY(-2px); }
     .card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
     .cat-tag { font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--pink); background: var(--pinkbg); border: 1px solid var(--pinkbr); padding: 3px 10px; border-radius: 6px; }
@@ -160,7 +105,6 @@
     .btn-unlock:hover { background: var(--pink); color: #fff; border-color: var(--pink); }
     .empty { text-align: center; padding: 80px; color: var(--subtle); font-size: 15px; display: none; }
 
-    /* UPLOAD */
     .upload-wrap { background: var(--surface); border-top: 1px solid var(--border); padding: 80px 48px; }
     .upload-inner { max-width: 680px; margin: 0 auto; }
     .upload-label { font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--pink); margin-bottom: 12px; display: block; }
@@ -179,7 +123,6 @@
     .btn-upload:hover { background: var(--pink2); }
     .btn-upload:active { transform: scale(0.98); }
 
-    /* MODAL */
     .overlay { display: none; position: fixed; inset: 0; z-index: 300; background: rgba(0,0,0,0.45); backdrop-filter: blur(12px); align-items: center; justify-content: center; padding: 20px; }
     .overlay.open { display: flex; }
     .modal { background: #fff; border: 1px solid var(--border2); border-radius: 22px; width: 100%; max-width: 520px; padding: 36px; position: relative; max-height: 92vh; overflow-y: auto; }
@@ -202,7 +145,6 @@
     .btn-dl { font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700; width: 100%; padding: 13px; background: var(--surface2); color: var(--text); border: 1px solid var(--border2); border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 10px; transition: all 0.15s; }
     .btn-dl:hover { border-color: var(--pinkbr); color: var(--pink); }
 
-    /* FOOTER */
     footer { border-top: 1px solid var(--border); padding: 36px 48px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; background: #fff; }
     .foot-brand { display: flex; align-items: center; gap: 9px; }
     .foot-logo { width: 26px; height: 26px; object-fit: contain; }
@@ -213,8 +155,7 @@
     .foot-link:hover { color: var(--text); }
     .foot-r { font-size: 12px; color: var(--subtle); }
 
-    /* TOAST */
-    #toast { position: fixed; bottom: 28px; right: 28px; z-index: 400; background: var(--text); color: #fff; font-size: 13px; font-weight: 600; padding: 13px 22px; border-radius: 12px; transform: translateY(90px); opacity: 0; transition: all 0.38s cubic-bezier(0.34,1.56,0.64,1); pointer-events: none; }
+    #toast { position: fixed; bottom: 28px; right: 28px; z-index: 400; background: var(--text); color: #fff; font-size: 13px; font-weight: 600; padding: 13px 22px; border-radius: 12px; transform: translateY(90px); opacity: 0; transition: all 0.38s cubic-bezier(0.34,1.56,0.64,1); pointer-events: none; max-width: 400px; word-break: break-word; }
     #toast.show { transform: translateY(0); opacity: 1; }
 
     @media (max-width: 640px) {
@@ -267,12 +208,8 @@
     <h1>The marketplace for<br>prompts that <span class="hl">actually work</span></h1>
     <p>Buy and sell battle-tested AI prompts. Every transaction verified on-chain. Creators earn directly — no platform cuts.</p>
     <div class="hero-ctas">
-      <button class="btn-hero-p" onclick="document.getElementById('browse').scrollIntoView({behavior:'smooth'})">
-        Browse Prompts →
-      </button>
-      <button class="btn-hero-s" onclick="document.getElementById('upload').scrollIntoView({behavior:'smooth'})">
-        Start Selling
-      </button>
+      <button class="btn-hero-p" onclick="document.getElementById('browse').scrollIntoView({behavior:'smooth'})">Browse Prompts →</button>
+      <button class="btn-hero-s" onclick="document.getElementById('upload').scrollIntoView({behavior:'smooth'})">Start Selling</button>
     </div>
     <div class="stats-bar">
       <div class="stat"><div class="stat-n">248</div><div class="stat-l">PROMPTS SOLD</div></div>
@@ -299,7 +236,6 @@
       </div>
     </div>
   </div>
-
   <div class="cats" id="catFilter">
     <button class="cat-btn on" onclick="setCat('')">All</button>
     <button class="cat-btn" onclick="setCat('Midjourney')">Midjourney</button>
@@ -309,7 +245,6 @@
     <button class="cat-btn" onclick="setCat('Gemini')">Gemini</button>
     <button class="cat-btn" onclick="setCat('Other')">Other</button>
   </div>
-
   <div class="grid" id="promptGrid"></div>
   <div class="empty" id="emptyMsg">No prompts found.</div>
 </section>
@@ -417,31 +352,51 @@
   ];
   var mine = [];
 
+  // ── Wallet using AIP-62 standard ──────────────────────────────────
+  function getPetraWallet() {
+    // Try new standard first
+    if (window.aptos) return window.aptos;
+    // Fallback to window.petra
+    if (window.petra) return window.petra;
+    return null;
+  }
+
+  function addrStr(addr) {
+    if (!addr) return '';
+    if (typeof addr === 'string') return addr;
+    if (addr.toString) return addr.toString();
+    return String(addr);
+  }
+
   async function connectWallet() {
-    if (wallet) { toast('Already connected: ' + wallet.slice(0,8) + '…'); return; }
-    if (!window.petra) {
+    if (wallet) { toast('Already connected: ' + wallet.slice(0,6) + '…' + wallet.slice(-4)); return; }
+    var petra = getPetraWallet();
+    if (!petra) {
       if (confirm('Petra Wallet not detected.\n\nClick OK to install it, then come back and connect.')) {
         window.open('https://chromewebstore.google.com/detail/petra-wallet/ejjladinnckdgjemekhnmkkejmbnaflb','_blank');
       }
       return;
     }
     try {
-      var r = await window.petra.connect();
-      wallet = r.address;
+      var r = await petra.connect();
+      wallet = addrStr(r.address);
       document.getElementById('walletBtn').classList.add('connected');
       document.getElementById('walletText').textContent = wallet.slice(0,6)+'…'+wallet.slice(-4);
-      toast('✓ Connected: ' + wallet.slice(0,8) + '…');
+      toast('✓ Connected: ' + wallet.slice(0,6) + '…' + wallet.slice(-4));
     } catch(e) {
-      toast('Error ' + (e.code||'') + ': ' + (e.message || JSON.stringify(e)));
+      if (e && e.code === 4001) { toast('Connection cancelled.'); return; }
+      toast('Could not connect: ' + (e && e.message ? e.message.slice(0,60) : JSON.stringify(e).slice(0,60)));
     }
   }
 
   async function tryAuto() {
-    if (!window.petra) return;
+    var petra = getPetraWallet();
+    if (!petra) return;
     try {
-      if (await window.petra.isConnected()) {
-        var a = await window.petra.account();
-        wallet = a.address;
+      var connected = await petra.isConnected();
+      if (connected) {
+        var a = await petra.account();
+        wallet = addrStr(a.address);
         document.getElementById('walletBtn').classList.add('connected');
         document.getElementById('walletText').textContent = wallet.slice(0,6)+'…'+wallet.slice(-4);
       }
