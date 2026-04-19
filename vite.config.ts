@@ -8,4 +8,9 @@ export default defineConfig({
       external: ['@telegram-apps/bridge'],
     },
   },
+  resolve: {
+    alias: {
+      '@telegram-apps/bridge': '/dev/null',
+    },
+  },
 })
