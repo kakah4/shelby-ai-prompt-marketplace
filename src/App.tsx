@@ -20,9 +20,7 @@ const SAMPLE_PROMPTS: PromptRow[] = [
   { id: 6, title: "Afrofuturist Sci-Fi Story Writer", category: "Claude", price: "0.0009", preview: "1200-word sci-fi set in Lagos 2087. First person, present tense, afrofuturist aesthetic…", full_prompt: "Write a 1200-word sci-fi story set in Lagos, Nigeria in 2087. Protagonist: Amara Osei, 28-year-old AI engineer who discovers her consciousness was secretly uploaded to a government supercomputer. Voice: literary fiction, first person present, afrofuturist.", creator: "0xU1V2...W3X4", blob_url: "" },
 ];
 
-// ShelbyUSD metadata address on Aptos Testnet
 const SHELBY_USD_ADDRESS = "0x1b18363a9f1fe5e6ebf247daba5cc1c18052bb232efdc4c50f556053922d98e1";
-
 const LOGO = <img src="/shelby-logo.png" alt="Shelby" style={{ width: 34, height: 34, objectFit: "contain" as const }} />;
 
 export default function App() {
@@ -66,13 +64,33 @@ export default function App() {
     catch (e: any) { showToast("Could not connect: " + (e?.message || "Unknown error")); }
   };
 
+  // ── Upload with Shelby blob storage via serverless function ──────────
   const handleUpload = async () => {
     if (!connected) { showToast("Connect your wallet first."); return; }
     if (!fTitle.trim()) { showToast("Enter a title."); return; }
     if (!fPrompt.trim()) { showToast("Paste your prompt."); return; }
+
     setUploading(true);
-    showToast("Uploading to Shelby Testnet...");
+    showToast("Uploading to Shelby network...");
+
     try {
+      // 1. Upload prompt text to Shelby via serverless function
+      const blobName = `prompts/${Date.now()}_${fTitle.trim().replace(/[^a-zA-Z0-9]/g, "_")}.txt`;
+
+      const shelbyRes = await fetch("/api/upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ promptText: fPrompt.trim(), blobName }),
+      });
+
+      const shelbyData = await shelbyRes.json();
+      const blobUrl = shelbyData.blobUrl || "";
+
+      if (!shelbyRes.ok) {
+        console.warn("Shelby upload failed, falling back to Supabase only:", shelbyData.error);
+      }
+
+      // 2. Save metadata to Supabase
       const newPrompt: PromptRow = {
         id: Date.now(),
         title: fTitle.trim(),
@@ -81,13 +99,19 @@ export default function App() {
         preview: fPrompt.trim().slice(0, 100) + "…",
         full_prompt: fPrompt.trim(),
         creator: shortAddr || "0xUnknown",
-        blob_url: "",
+        blob_url: blobUrl,
       };
+
       await insertPrompt(newPrompt);
       setPrompts(prev => [newPrompt, ...prev]);
       setFTitle(""); setFCat("Midjourney"); setFPrice(""); setFPrompt("");
       setShowUpload(false);
-      showToast("✓ Prompt uploaded to Shelby Testnet!");
+
+      if (blobUrl) {
+        showToast("✓ Prompt stored on Shelby network! 🎉");
+      } else {
+        showToast("✓ Prompt uploaded (Supabase fallback)");
+      }
     } catch (e: any) {
       showToast("Upload failed: " + (e?.message || "Unknown error"));
     } finally {
@@ -95,7 +119,7 @@ export default function App() {
     }
   };
 
-  // Real on-chain payment — triggers Petra popup
+  // ── Real on-chain payment — triggers Petra popup ─────────────────────
   const handleUnlock = async (prompt: PromptRow) => {
     if (!connected) { showToast("Connect your wallet first."); return; }
     if (unlocked.includes(prompt.id)) return;
@@ -119,7 +143,6 @@ export default function App() {
       if (msg.includes("rejected") || msg.includes("cancel") || e?.code === 4001) {
         showToast("Transaction cancelled.");
       } else {
-        // Demo fallback for sample prompts with fake addresses
         setUnlocked(prev => [...prev, prompt.id]);
         showToast("✓ Unlocked · Demo mode");
       }
@@ -254,6 +277,11 @@ export default function App() {
                   <span style={{ fontSize: 12, color: "var(--subtle)" }}>by {p.creator}</span>
                   <button onClick={e => { e.stopPropagation(); setActivePrompt(p); }} style={{ fontSize: 12, fontWeight: 600, color: "var(--pink)", background: "var(--pinkbg)", border: "1px solid var(--pinkbr)", borderRadius: 8, padding: "7px 14px", cursor: "pointer" }}>Unlock →</button>
                 </div>
+                {p.blob_url && (
+                  <div style={{ marginTop: 10, fontSize: 11, color: "var(--green)", display: "flex", alignItems: "center", gap: 4 }}>
+                    <span>⚡</span> Stored on Shelby
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -265,7 +293,7 @@ export default function App() {
         <div style={{ maxWidth: 680, margin: "0 auto" }}>
           <span style={{ fontFamily: "Syne, sans-serif", fontSize: 12, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--pink)", marginBottom: 12, display: "block" }}>For Creators</span>
           <h3 style={{ fontFamily: "Syne, sans-serif", fontSize: 32, fontWeight: 800, letterSpacing: "-0.03em", marginBottom: 8 }}>Sell your best prompts.<br />Earn ShelbyUSD.</h3>
-          <p style={{ fontSize: 15, color: "var(--muted)", marginBottom: 36 }}>Upload once. Earn every time someone unlocks your prompt. 100% goes to you.</p>
+          <p style={{ fontSize: 15, color: "var(--muted)", marginBottom: 36 }}>Upload once. Earn every time someone unlocks your prompt. Stored on Shelby network. 100% goes to you.</p>
           <div style={{ background: "#fff", border: "1px solid var(--border2)", borderRadius: 22, padding: 36 }}>
             <div style={s.field}><label style={s.fieldLabel}>Prompt Title</label><input style={s.fieldInput} value={fTitle} onChange={e => setFTitle(e.target.value)} placeholder="e.g. Cinematic Midjourney V6 City Scene" /></div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 18 }}>
@@ -273,7 +301,9 @@ export default function App() {
               <div><label style={s.fieldLabel}>Category</label><select style={{ ...s.fieldInput, cursor: "pointer" }} value={fCat} onChange={e => setFCat(e.target.value)}>{CATEGORIES.filter(c => c !== "All").map(c => <option key={c}>{c}</option>)}</select></div>
             </div>
             <div style={s.field}><label style={s.fieldLabel}>Full Prompt</label><textarea style={{ ...s.fieldInput, minHeight: 130, resize: "vertical", lineHeight: 1.65 }} value={fPrompt} onChange={e => setFPrompt(e.target.value)} placeholder="Paste your full prompt here…" /></div>
-            <button onClick={handleUpload} disabled={uploading} style={{ ...s.btnPink, cursor: uploading ? "not-allowed" : "pointer", opacity: uploading ? 0.7 : 1 }}>{uploading ? "⏳ Uploading..." : "🚀 Upload to Shelby Testnet"}</button>
+            <button onClick={handleUpload} disabled={uploading} style={{ ...s.btnPink, cursor: uploading ? "not-allowed" : "pointer", opacity: uploading ? 0.7 : 1 }}>
+              {uploading ? "⏳ Uploading to Shelby..." : "⚡ Upload to Shelby Network"}
+            </button>
           </div>
         </div>
       </div>
@@ -296,7 +326,11 @@ export default function App() {
             <button style={{ ...s.modalX, cursor: "pointer" }} onClick={() => setActivePrompt(null)}>✕</button>
             <span style={s.catTag}>{activePrompt.category}</span>
             <h4 style={{ fontFamily: "Syne, sans-serif", fontSize: 21, fontWeight: 800, margin: "14px 0 4px", letterSpacing: "-0.02em" }}>{activePrompt.title}</h4>
-            <p style={{ fontSize: 12, color: "var(--subtle)", marginBottom: 24 }}>by {activePrompt.creator}</p>
+            <p style={{ fontSize: 12, color: "var(--subtle)", marginBottom: 4 }}>by {activePrompt.creator}</p>
+            {activePrompt.blob_url && (
+              <p style={{ fontSize: 11, color: "var(--green)", marginBottom: 20 }}>⚡ Stored on Shelby Network</p>
+            )}
+            {!activePrompt.blob_url && <div style={{ marginBottom: 20 }} />}
             {unlocked.includes(activePrompt.id) ? (
               <>
                 <div style={{ display: "flex", alignItems: "center", gap: 9, background: "var(--greenbg)", border: "1px solid rgba(13,122,78,0.2)", borderRadius: 10, padding: "11px 16px", marginBottom: 18, fontSize: 12, fontWeight: 600, color: "var(--green)" }}>
@@ -329,14 +363,16 @@ export default function App() {
           <div style={s.modal}>
             <button style={{ ...s.modalX, cursor: "pointer" }} onClick={() => setShowUpload(false)}>✕</button>
             <h3 style={{ fontFamily: "Syne, sans-serif", fontSize: 20, fontWeight: 800, marginBottom: 6 }}>Upload a Prompt</h3>
-            <p style={{ fontSize: 14, color: "var(--muted)", marginBottom: 24 }}>Stored on Shelby Testnet. Earn ShelbyUSD on every unlock.</p>
+            <p style={{ fontSize: 14, color: "var(--muted)", marginBottom: 24 }}>Stored on Shelby Network. Earn ShelbyUSD on every unlock.</p>
             <div style={s.field}><label style={s.fieldLabel}>Prompt Title</label><input style={s.fieldInput} value={fTitle} onChange={e => setFTitle(e.target.value)} placeholder="e.g. Cinematic Midjourney V6 City Scene" /></div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 18 }}>
               <div><label style={s.fieldLabel}>Price (SUSD)</label><input style={s.fieldInput} value={fPrice} onChange={e => setFPrice(e.target.value)} placeholder="0.001" /></div>
               <div><label style={s.fieldLabel}>Category</label><select style={{ ...s.fieldInput, cursor: "pointer" }} value={fCat} onChange={e => setFCat(e.target.value)}>{CATEGORIES.filter(c => c !== "All").map(c => <option key={c}>{c}</option>)}</select></div>
             </div>
             <div style={s.field}><label style={s.fieldLabel}>Full Prompt</label><textarea style={{ ...s.fieldInput, minHeight: 120, resize: "vertical", lineHeight: 1.65 }} value={fPrompt} onChange={e => setFPrompt(e.target.value)} placeholder="Paste your full prompt here…" /></div>
-            <button onClick={handleUpload} disabled={uploading} style={{ ...s.btnPink, cursor: uploading ? "not-allowed" : "pointer" }}>{uploading ? "⏳ Uploading..." : "🚀 Upload to Shelby Testnet"}</button>
+            <button onClick={handleUpload} disabled={uploading} style={{ ...s.btnPink, cursor: uploading ? "not-allowed" : "pointer" }}>
+              {uploading ? "⏳ Uploading to Shelby..." : "⚡ Upload to Shelby Network"}
+            </button>
             <button onClick={() => setShowUpload(false)} style={{ ...s.btnSec, cursor: "pointer" }}>Cancel</button>
           </div>
         </div>
