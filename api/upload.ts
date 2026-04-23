@@ -13,11 +13,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const privateKey = process.env.SHELBY_PRIVATE_KEY;
     if (!apiKey || !privateKey) return res.status(500).json({ error: "Shelby not configured" });
 
-    const client = new ShelbyNodeClient({ network: Network.TESTNET, apiKey });
+    const client = new ShelbyNodeClient({ network: Network.SHELBYNET, apiKey });
     const signer = Account.fromPrivateKey({ privateKey: new Ed25519PrivateKey(privateKey) });
 
     const blobData = new TextEncoder().encode(promptText);
-    const TIME_TO_LIVE = 365 * 24 * 60 * 60 * 1_000_000; // 1 year
+    const TIME_TO_LIVE = 365 * 24 * 60 * 60 * 1_000_000;
 
     await client.upload({
       blobData,
@@ -26,7 +26,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       expirationMicros: Date.now() * 1000 + TIME_TO_LIVE,
     });
 
-    const blobUrl = `https://api.shelby.xyz/shelby/v1/blobs/${signer.accountAddress}/${blobName}`;
+    const blobUrl = `https://api.shelbynet.shelby.xyz/shelby/v1/blobs/${signer.accountAddress}/${blobName}`;
+    console.log("✅ Uploaded to Shelby:", blobUrl);
     return res.status(200).json({ success: true, blobUrl });
   } catch (e: any) {
     console.error("Upload error:", e);
