@@ -12,6 +12,7 @@ export interface PromptRow {
   price: string;
   preview: string;
   full_prompt: string;
+  sample_output: string;
   creator: string;
   blob_url: string;
   created_at?: string;

@@ -12,12 +12,12 @@ function addrToString(address: unknown): string {
 const CATEGORIES = ["All", "Midjourney", "ChatGPT", "Claude", "Stable Diffusion", "Gemini", "Other"];
 
 const SAMPLE_PROMPTS: PromptRow[] = [
-  { id: 1, title: "Cinematic Midjourney V6 Prompt", category: "Midjourney", price: "0.0008", preview: "A breathtaking cyberpunk cityscape at night, neon signs reflected in wet streets, flying cars…", full_prompt: "A breathtaking cyberpunk city at night, neon signs reflected in wet streets, flying cars weaving between glass skyscrapers, ultra-detailed, cinematic lighting, 8k --ar 16:9 --v 6 --style raw", creator: "0xA1B2...C3D4", blob_url: "" },
-  { id: 2, title: "Cold Email Master Template", category: "Claude", price: "0.0005", preview: "Expert business communicator. Write concise, compelling cold emails that convert…", full_prompt: "You are an expert business communicator. Write a concise, compelling cold email to [TARGET] at [COMPANY] about [PRODUCT]. Open with a personalized hook, state the value in one sentence, include social proof, end with a low-commitment CTA. Under 150 words.", creator: "0xE5F6...G7H8", blob_url: "" },
-  { id: 3, title: "Deep Work Productivity System", category: "ChatGPT", price: "0.0012", preview: "Elite productivity coach trained in GTD, time-blocking and deep work. Identifies bottlenecks…", full_prompt: "You are an elite productivity coach trained in GTD, time-blocking, and deep work. I will describe my goals and workload. 1) Identify my top 3 bottlenecks. 2) Design a weekly time-block schedule. 3) Suggest one keystone habit. 4) Give a 30-day accountability framework.", creator: "0xI9J0...K1L2", blob_url: "" },
-  { id: 4, title: "Anime Portrait — Cyberpunk Style", category: "Stable Diffusion", price: "0.0007", preview: "Beautiful anime character, silver hair, glowing violet eyes, futuristic cyberpunk neon Tokyo…", full_prompt: "beautiful anime girl, long silver hair, glowing violet eyes, futuristic cyberpunk outfit, neon Tokyo street background, masterpiece, best quality, ultra-detailed, 8k --neg lowres, bad anatomy, worst quality", creator: "0xM3N4...O5P6", blob_url: "" },
-  { id: 5, title: "React Component Code Generator", category: "ChatGPT", price: "0.0006", preview: "Generate production-ready React components with TypeScript, Tailwind CSS and full accessibility…", full_prompt: "Generate a production-ready React component for [FEATURE]. Requirements: TypeScript, Tailwind CSS, WCAG AA accessible, mobile-first, no extra dependencies. Include TypeScript interfaces, error boundary, loading/empty states.", creator: "0xQ7R8...S9T0", blob_url: "" },
-  { id: 6, title: "Afrofuturist Sci-Fi Story Writer", category: "Claude", price: "0.0009", preview: "1200-word sci-fi set in Lagos 2087. First person, present tense, afrofuturist aesthetic…", full_prompt: "Write a 1200-word sci-fi story set in Lagos, Nigeria in 2087. Protagonist: Amara Osei, 28-year-old AI engineer who discovers her consciousness was secretly uploaded to a government supercomputer. Voice: literary fiction, first person present, afrofuturist.", creator: "0xU1V2...W3X4", blob_url: "" },
+  { id: 1, title: "Cinematic Midjourney V6 Prompt", category: "Midjourney", price: "0.0008", preview: "A breathtaking cyberpunk cityscape at night, neon signs reflected in wet streets, flying cars…", full_prompt: "A breathtaking cyberpunk city at night, neon signs reflected in wet streets, flying cars weaving between glass skyscrapers, ultra-detailed, cinematic lighting, 8k --ar 16:9 --v 6 --style raw", sample_output: "Generated a stunning 8K cyberpunk cityscape with vivid neon reflections, dramatic lighting, and photorealistic flying vehicles. The image had a cinematic aspect ratio perfect for wallpapers and presentations.", creator: "0xA1B2...C3D4", blob_url: "" },
+  { id: 2, title: "Cold Email Master Template", category: "Claude", price: "0.0005", preview: "Expert business communicator. Write concise, compelling cold emails that convert…", full_prompt: "You are an expert business communicator. Write a concise, compelling cold email to [TARGET] at [COMPANY] about [PRODUCT]. Open with a personalized hook, state the value in one sentence, include social proof, end with a low-commitment CTA. Under 150 words.", sample_output: "Subject: Quick question about [COMPANY]'s data pipeline\n\nHi Sarah,\n\nNoticed [COMPANY] recently scaled to 500+ engineers — congrats. Most teams at that stage hit serious bottlenecks with data orchestration.\n\nWe helped Stripe cut pipeline failures by 60% in 90 days.\n\nWorth a 15-min call this week?\n\nBest, [NAME]", creator: "0xE5F6...G7H8", blob_url: "" },
+  { id: 3, title: "Deep Work Productivity System", category: "ChatGPT", price: "0.0012", preview: "Elite productivity coach trained in GTD, time-blocking and deep work. Identifies bottlenecks…", full_prompt: "You are an elite productivity coach trained in GTD, time-blocking, and deep work. I will describe my goals and workload. 1) Identify my top 3 bottlenecks. 2) Design a weekly time-block schedule. 3) Suggest one keystone habit. 4) Give a 30-day accountability framework.", sample_output: "After analyzing your workload: Your top 3 bottlenecks are context-switching, unclear priorities, and reactive email habits. Recommended schedule: 6-9AM deep work block (no notifications), 9-11AM meetings, 2-4PM creative work. Keystone habit: Daily 5-min shutdown ritual listing tomorrow's top 3 tasks.", creator: "0xI9J0...K1L2", blob_url: "" },
+  { id: 4, title: "Anime Portrait — Cyberpunk Style", category: "Stable Diffusion", price: "0.0007", preview: "Beautiful anime character, silver hair, glowing violet eyes, futuristic cyberpunk neon Tokyo…", full_prompt: "beautiful anime girl, long silver hair, glowing violet eyes, futuristic cyberpunk outfit, neon Tokyo street background, masterpiece, best quality, ultra-detailed, 8k --neg lowres, bad anatomy, worst quality", sample_output: "Produced a stunning anime portrait with perfect anatomy, vibrant violet eyes with realistic glow effects, detailed silver hair with individual strand rendering, and a neon-lit Tokyo backdrop with depth of field blur.", creator: "0xM3N4...O5P6", blob_url: "" },
+  { id: 5, title: "React Component Code Generator", category: "ChatGPT", price: "0.0006", preview: "Generate production-ready React components with TypeScript, Tailwind CSS and full accessibility…", full_prompt: "Generate a production-ready React component for [FEATURE]. Requirements: TypeScript, Tailwind CSS, WCAG AA accessible, mobile-first, no extra dependencies. Include TypeScript interfaces, error boundary, loading/empty states.", sample_output: "Generated a fully typed React component with proper TypeScript interfaces, Tailwind responsive classes, ARIA labels, keyboard navigation support, loading skeleton, empty state illustration, and error boundary with retry logic. Zero additional dependencies.", creator: "0xQ7R8...S9T0", blob_url: "" },
+  { id: 6, title: "Afrofuturist Sci-Fi Story Writer", category: "Claude", price: "0.0009", preview: "1200-word sci-fi set in Lagos 2087. First person, present tense, afrofuturist aesthetic…", full_prompt: "Write a 1200-word sci-fi story set in Lagos, Nigeria in 2087. Protagonist: Amara Osei, 28-year-old AI engineer who discovers her consciousness was secretly uploaded to a government supercomputer. Voice: literary fiction, first person present, afrofuturist.", sample_output: "The story opens with Amara debugging neural interfaces in Victoria Island's floating tech district, before she discovers fragmented memories that aren't hers. Rich with Yoruba proverbs, Afrobeat references, and vivid descriptions of Lagos' transformation into Africa's AI capital. Received 4.9/5 stars from beta readers.", creator: "0xU1V2...W3X4", blob_url: "" },
 ];
 
 const SHELBY_USD_ADDRESS = "0x1b18363a9f1fe5e6ebf247daba5cc1c18052bb232efdc4c50f556053922d98e1";
@@ -33,6 +33,7 @@ export default function App() {
   const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState<"all" | "mine">("all");
   const [activePrompt, setActivePrompt] = useState<PromptRow | null>(null);
+  const [modalTab, setModalTab] = useState<"proof" | "unlock">("proof");
   const [unlocked, setUnlocked] = useState<number[]>([]);
   const [showUpload, setShowUpload] = useState(false);
   const [toast, setToast] = useState("");
@@ -42,6 +43,7 @@ export default function App() {
   const [fCat, setFCat] = useState("Midjourney");
   const [fPrice, setFPrice] = useState("");
   const [fPrompt, setFPrompt] = useState("");
+  const [fSample, setFSample] = useState("");
 
   useEffect(() => {
     fetchPrompts().then(rows => {
@@ -64,33 +66,30 @@ export default function App() {
     catch (e: any) { showToast("Could not connect: " + (e?.message || "Unknown error")); }
   };
 
-  // ── Upload with Shelby blob storage via serverless function ──────────
+  const openModal = (p: PromptRow) => {
+    setActivePrompt(p);
+    setModalTab("proof");
+  };
+
   const handleUpload = async () => {
     if (!connected) { showToast("Connect your wallet first."); return; }
     if (!fTitle.trim()) { showToast("Enter a title."); return; }
     if (!fPrompt.trim()) { showToast("Paste your prompt."); return; }
+    if (!fSample.trim()) { showToast("Add a sample output so buyers can verify quality."); return; }
 
     setUploading(true);
     showToast("Uploading to Shelby network...");
 
     try {
-      // 1. Upload prompt text to Shelby via serverless function
       const blobName = `prompts/${Date.now()}_${fTitle.trim().replace(/[^a-zA-Z0-9]/g, "_")}.txt`;
-
       const shelbyRes = await fetch("/api/upload", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ promptText: fPrompt.trim(), blobName }),
       });
-
       const shelbyData = await shelbyRes.json();
       const blobUrl = shelbyData.blobUrl || "";
 
-      if (!shelbyRes.ok) {
-        console.warn("Shelby upload failed, falling back to Supabase only:", shelbyData.error);
-      }
-
-      // 2. Save metadata to Supabase
       const newPrompt: PromptRow = {
         id: Date.now(),
         title: fTitle.trim(),
@@ -98,20 +97,16 @@ export default function App() {
         price: fPrice || "0.001",
         preview: fPrompt.trim().slice(0, 100) + "…",
         full_prompt: fPrompt.trim(),
+        sample_output: fSample.trim(),
         creator: shortAddr || "0xUnknown",
         blob_url: blobUrl,
       };
 
       await insertPrompt(newPrompt);
       setPrompts(prev => [newPrompt, ...prev]);
-      setFTitle(""); setFCat("Midjourney"); setFPrice(""); setFPrompt("");
+      setFTitle(""); setFCat("Midjourney"); setFPrice(""); setFPrompt(""); setFSample("");
       setShowUpload(false);
-
-      if (blobUrl) {
-        showToast("✓ Prompt stored on Shelby network! 🎉");
-      } else {
-        showToast("✓ Prompt uploaded (Supabase fallback)");
-      }
+      showToast(blobUrl ? "✓ Prompt stored on Shelby network! 🎉" : "✓ Prompt uploaded!");
     } catch (e: any) {
       showToast("Upload failed: " + (e?.message || "Unknown error"));
     } finally {
@@ -119,7 +114,6 @@ export default function App() {
     }
   };
 
-  // ── Real on-chain payment — triggers Petra popup ─────────────────────
   const handleUnlock = async (prompt: PromptRow) => {
     if (!connected) { showToast("Connect your wallet first."); return; }
     if (unlocked.includes(prompt.id)) return;
@@ -180,8 +174,8 @@ export default function App() {
     grid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: 16 },
     card: { background: "#fff", border: "1px solid var(--border)", borderRadius: 18, padding: 26, cursor: "pointer", transition: "all 0.2s" },
     catTag: { fontSize: 11, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase" as const, color: "var(--pink)", background: "var(--pinkbg)", border: "1px solid var(--pinkbr)", padding: "3px 10px", borderRadius: 6 },
-    overlay: { display: "flex", position: "fixed", inset: 0, zIndex: 300, background: "rgba(0,0,0,0.45)", backdropFilter: "blur(12px)", alignItems: "center", justifyContent: "center", padding: 20 },
-    modal: { background: "#fff", border: "1px solid var(--border2)", borderRadius: 22, width: "100%", maxWidth: 520, padding: 36, position: "relative" as const, maxHeight: "92vh", overflowY: "auto" as const },
+    overlay: { display: "flex", position: "fixed", inset: 0, zIndex: 300, background: "rgba(0,0,0,0.5)", backdropFilter: "blur(12px)", alignItems: "center", justifyContent: "center", padding: 20 },
+    modal: { background: "#fff", border: "1px solid var(--border2)", borderRadius: 22, width: "100%", maxWidth: 560, padding: 36, position: "relative" as const, maxHeight: "92vh", overflowY: "auto" as const },
     modalX: { position: "absolute" as const, top: 20, right: 20, background: "var(--surface2)", border: "1px solid var(--border)", color: "var(--muted)", borderRadius: 8, width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 },
     field: { marginBottom: 18 },
     fieldLabel: { display: "block", fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, color: "var(--subtle)", marginBottom: 7 },
@@ -264,7 +258,7 @@ export default function App() {
         ) : (
           <div style={s.grid}>
             {filtered.map(p => (
-              <div key={p.id} style={s.card} onClick={() => setActivePrompt(p)}
+              <div key={p.id} style={s.card} onClick={() => openModal(p)}
                 onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.borderColor = "var(--pinkbr)"; (e.currentTarget as HTMLDivElement).style.transform = "translateY(-2px)"; (e.currentTarget as HTMLDivElement).style.boxShadow = "0 8px 40px rgba(255,45,120,0.08)"; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = "var(--border)"; (e.currentTarget as HTMLDivElement).style.transform = "none"; (e.currentTarget as HTMLDivElement).style.boxShadow = "none"; }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
@@ -272,14 +266,19 @@ export default function App() {
                   <span style={{ fontSize: 13, fontWeight: 700 }}>{p.price} <span style={{ fontSize: 11, color: "var(--subtle)" }}>SUSD</span></span>
                 </div>
                 <div style={{ fontFamily: "Syne, sans-serif", fontSize: 15, fontWeight: 700, lineHeight: 1.4, marginBottom: 8 }}>{p.title}</div>
-                <div style={{ fontSize: 13, color: "var(--muted)", lineHeight: 1.65, marginBottom: 20 }}>{p.preview}</div>
+                <div style={{ fontSize: 13, color: "var(--muted)", lineHeight: 1.65, marginBottom: 12 }}>{p.preview}</div>
+                {p.sample_output && (
+                  <div style={{ fontSize: 11, color: "var(--green)", background: "var(--greenbg)", border: "1px solid rgba(13,122,78,0.15)", borderRadius: 6, padding: "4px 10px", marginBottom: 14, display: "inline-block" }}>
+                    ✓ Proof of output available
+                  </div>
+                )}
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <span style={{ fontSize: 12, color: "var(--subtle)" }}>by {p.creator}</span>
-                  <button onClick={e => { e.stopPropagation(); setActivePrompt(p); }} style={{ fontSize: 12, fontWeight: 600, color: "var(--pink)", background: "var(--pinkbg)", border: "1px solid var(--pinkbr)", borderRadius: 8, padding: "7px 14px", cursor: "pointer" }}>Unlock →</button>
+                  <button onClick={e => { e.stopPropagation(); openModal(p); }} style={{ fontSize: 12, fontWeight: 600, color: "var(--pink)", background: "var(--pinkbg)", border: "1px solid var(--pinkbr)", borderRadius: 8, padding: "7px 14px", cursor: "pointer" }}>View & Unlock →</button>
                 </div>
                 {p.blob_url && (
-                  <div style={{ marginTop: 10, fontSize: 11, color: "var(--green)", display: "flex", alignItems: "center", gap: 4 }}>
-                    <span>⚡</span> Stored on Shelby
+                  <div style={{ marginTop: 10, fontSize: 11, color: "var(--subtle)", display: "flex", alignItems: "center", gap: 4 }}>
+                    ⚡ Stored on Shelby
                   </div>
                 )}
               </div>
@@ -301,6 +300,11 @@ export default function App() {
               <div><label style={s.fieldLabel}>Category</label><select style={{ ...s.fieldInput, cursor: "pointer" }} value={fCat} onChange={e => setFCat(e.target.value)}>{CATEGORIES.filter(c => c !== "All").map(c => <option key={c}>{c}</option>)}</select></div>
             </div>
             <div style={s.field}><label style={s.fieldLabel}>Full Prompt</label><textarea style={{ ...s.fieldInput, minHeight: 130, resize: "vertical", lineHeight: 1.65 }} value={fPrompt} onChange={e => setFPrompt(e.target.value)} placeholder="Paste your full prompt here…" /></div>
+            <div style={s.field}>
+              <label style={s.fieldLabel}>Sample Output / Proof of Quality</label>
+              <textarea style={{ ...s.fieldInput, minHeight: 100, resize: "vertical", lineHeight: 1.65 }} value={fSample} onChange={e => setFSample(e.target.value)} placeholder="Paste a sample result your prompt produced — this is shown to buyers BEFORE they pay, so they can verify quality…" />
+              <div style={{ fontSize: 11, color: "var(--subtle)", marginTop: 6 }}>💡 A good sample output increases conversions. Be specific about what the prompt produced.</div>
+            </div>
             <button onClick={handleUpload} disabled={uploading} style={{ ...s.btnPink, cursor: uploading ? "not-allowed" : "pointer", opacity: uploading ? 0.7 : 1 }}>
               {uploading ? "⏳ Uploading to Shelby..." : "⚡ Upload to Shelby Network"}
             </button>
@@ -324,35 +328,74 @@ export default function App() {
         <div style={s.overlay} onClick={e => e.target === e.currentTarget && setActivePrompt(null)}>
           <div style={s.modal}>
             <button style={{ ...s.modalX, cursor: "pointer" }} onClick={() => setActivePrompt(null)}>✕</button>
+
+            {/* Header */}
             <span style={s.catTag}>{activePrompt.category}</span>
-            <h4 style={{ fontFamily: "Syne, sans-serif", fontSize: 21, fontWeight: 800, margin: "14px 0 4px", letterSpacing: "-0.02em" }}>{activePrompt.title}</h4>
-            <p style={{ fontSize: 12, color: "var(--subtle)", marginBottom: 4 }}>by {activePrompt.creator}</p>
-            {activePrompt.blob_url && (
-              <p style={{ fontSize: 11, color: "var(--green)", marginBottom: 20 }}>⚡ Stored on Shelby Network</p>
+            <h4 style={{ fontFamily: "Syne, sans-serif", fontSize: 20, fontWeight: 800, margin: "12px 0 4px", letterSpacing: "-0.02em" }}>{activePrompt.title}</h4>
+            <p style={{ fontSize: 12, color: "var(--subtle)", marginBottom: 20 }}>by {activePrompt.creator} {activePrompt.blob_url && <span style={{ color: "var(--green)", marginLeft: 8 }}>⚡ On Shelby</span>}</p>
+
+            {/* Modal tabs */}
+            {!unlocked.includes(activePrompt.id) && (
+              <div style={{ display: "flex", gap: 3, background: "var(--surface2)", border: "1px solid var(--border)", borderRadius: 10, padding: 3, marginBottom: 22 }}>
+                <button onClick={() => setModalTab("proof")} style={{ flex: 1, fontSize: 13, fontWeight: 600, color: modalTab === "proof" ? "var(--text)" : "var(--muted)", background: modalTab === "proof" ? "#fff" : "none", border: "none", borderRadius: 7, padding: "8px 16px", cursor: "pointer", boxShadow: modalTab === "proof" ? "0 1px 3px rgba(0,0,0,0.08)" : "none" }}>
+                  👁 Proof of Output
+                </button>
+                <button onClick={() => setModalTab("unlock")} style={{ flex: 1, fontSize: 13, fontWeight: 600, color: modalTab === "unlock" ? "var(--text)" : "var(--muted)", background: modalTab === "unlock" ? "#fff" : "none", border: "none", borderRadius: 7, padding: "8px 16px", cursor: "pointer", boxShadow: modalTab === "unlock" ? "0 1px 3px rgba(0,0,0,0.08)" : "none" }}>
+                  🔓 Unlock Prompt
+                </button>
+              </div>
             )}
-            {!activePrompt.blob_url && <div style={{ marginBottom: 20 }} />}
-            {unlocked.includes(activePrompt.id) ? (
-              <>
-                <div style={{ display: "flex", alignItems: "center", gap: 9, background: "var(--greenbg)", border: "1px solid rgba(13,122,78,0.2)", borderRadius: 10, padding: "11px 16px", marginBottom: 18, fontSize: 12, fontWeight: 600, color: "var(--green)" }}>
-                  ✅ Unlocked · On-chain · Aptos Testnet
+
+            {/* PROOF TAB */}
+            {!unlocked.includes(activePrompt.id) && modalTab === "proof" && (
+              <div>
+                <div style={{ background: "var(--surface2)", border: "1px solid var(--border2)", borderRadius: 12, padding: "14px 18px", marginBottom: 16 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, color: "var(--subtle)", marginBottom: 8 }}>What this prompt produces</div>
+                  <p style={{ fontSize: 14, color: "var(--text)", lineHeight: 1.7 }}>{activePrompt.sample_output || "No sample output provided by creator."}</p>
                 </div>
-                <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: 20, marginBottom: 18 }}>
-                  <pre style={{ fontFamily: "DM Sans, sans-serif", fontSize: 13, color: "var(--text)", whiteSpace: "pre-wrap", lineHeight: 1.75 }}>{activePrompt.full_prompt}</pre>
+                <div style={{ background: "var(--pinkbg)", border: "1px solid var(--pinkbr)", borderRadius: 12, padding: "14px 18px", marginBottom: 20 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, color: "var(--pink)", marginBottom: 8 }}>Prompt Preview (blurred)</div>
+                  <p style={{ fontSize: 14, color: "var(--text)", lineHeight: 1.7, filter: "blur(4px)", userSelect: "none" as const }}>{activePrompt.full_prompt.slice(0, 120)}…</p>
+                  <p style={{ fontSize: 11, color: "var(--muted)", marginTop: 8 }}>🔒 Unlock to see the full prompt</p>
                 </div>
-                <button onClick={() => { const blob = new Blob([activePrompt.full_prompt], { type: "text/plain" }); const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = activePrompt.title.replace(/[^a-z0-9]/gi, "_").toLowerCase() + ".txt"; a.click(); URL.revokeObjectURL(url); }} style={{ ...s.btnPink, background: "var(--surface2)", color: "var(--text)", boxShadow: "none", cursor: "pointer" }}>⬇ Download .txt</button>
-              </>
-            ) : (
-              <>
+                <button onClick={() => setModalTab("unlock")} style={{ ...s.btnPink, cursor: "pointer" }}>
+                  Looks good — Unlock for {activePrompt.price} SUSD →
+                </button>
+                <button onClick={() => setActivePrompt(null)} style={{ ...s.btnSec, cursor: "pointer" }}>Close</button>
+              </div>
+            )}
+
+            {/* UNLOCK TAB */}
+            {!unlocked.includes(activePrompt.id) && modalTab === "unlock" && (
+              <div>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "var(--surface2)", border: "1px solid var(--border2)", borderRadius: 12, padding: "16px 20px", marginBottom: 22 }}>
                   <span style={{ fontSize: 12, color: "var(--muted)" }}>Price to unlock</span>
                   <div><span style={{ fontFamily: "Syne, sans-serif", fontSize: 24, fontWeight: 700, color: "var(--pink)" }}>{activePrompt.price}</span><span style={{ fontSize: 12, color: "var(--subtle)", marginLeft: 4 }}>ShelbyUSD</span></div>
                 </div>
+                <div style={{ fontSize: 13, color: "var(--muted)", marginBottom: 18, lineHeight: 1.6 }}>
+                  💡 Not sure yet? <button onClick={() => setModalTab("proof")} style={{ color: "var(--pink)", background: "none", border: "none", fontSize: 13, cursor: "pointer", textDecoration: "underline" }}>View proof of output first</button>
+                </div>
                 <button onClick={() => handleUnlock(activePrompt)} disabled={paying} style={{ ...s.btnPink, cursor: paying ? "not-allowed" : "pointer", opacity: paying ? 0.7 : 1 }}>
                   {paying ? "⏳ Waiting for Petra..." : "🔓 Pay & Unlock"}
                 </button>
-              </>
+                <button onClick={() => setActivePrompt(null)} style={{ ...s.btnSec, cursor: "pointer" }}>Cancel</button>
+              </div>
             )}
-            <button onClick={() => setActivePrompt(null)} style={{ ...s.btnSec, cursor: "pointer" }}>Close</button>
+
+            {/* UNLOCKED VIEW */}
+            {unlocked.includes(activePrompt.id) && (
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: 9, background: "var(--greenbg)", border: "1px solid rgba(13,122,78,0.2)", borderRadius: 10, padding: "11px 16px", marginBottom: 18, fontSize: 12, fontWeight: 600, color: "var(--green)" }}>
+                  ✅ Unlocked · On-chain proof recorded · Aptos Testnet
+                </div>
+                <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: 20, marginBottom: 18 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, color: "var(--subtle)", marginBottom: 10 }}>Full Prompt</div>
+                  <pre style={{ fontFamily: "DM Sans, sans-serif", fontSize: 13, color: "var(--text)", whiteSpace: "pre-wrap", lineHeight: 1.75 }}>{activePrompt.full_prompt}</pre>
+                </div>
+                <button onClick={() => { const blob = new Blob([activePrompt.full_prompt], { type: "text/plain" }); const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = activePrompt.title.replace(/[^a-z0-9]/gi, "_").toLowerCase() + ".txt"; a.click(); URL.revokeObjectURL(url); }} style={{ ...s.btnPink, background: "var(--surface2)", color: "var(--text)", boxShadow: "none", cursor: "pointer" }}>⬇ Download .txt</button>
+                <button onClick={() => setActivePrompt(null)} style={{ ...s.btnSec, cursor: "pointer" }}>Close</button>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -369,7 +412,12 @@ export default function App() {
               <div><label style={s.fieldLabel}>Price (SUSD)</label><input style={s.fieldInput} value={fPrice} onChange={e => setFPrice(e.target.value)} placeholder="0.001" /></div>
               <div><label style={s.fieldLabel}>Category</label><select style={{ ...s.fieldInput, cursor: "pointer" }} value={fCat} onChange={e => setFCat(e.target.value)}>{CATEGORIES.filter(c => c !== "All").map(c => <option key={c}>{c}</option>)}</select></div>
             </div>
-            <div style={s.field}><label style={s.fieldLabel}>Full Prompt</label><textarea style={{ ...s.fieldInput, minHeight: 120, resize: "vertical", lineHeight: 1.65 }} value={fPrompt} onChange={e => setFPrompt(e.target.value)} placeholder="Paste your full prompt here…" /></div>
+            <div style={s.field}><label style={s.fieldLabel}>Full Prompt</label><textarea style={{ ...s.fieldInput, minHeight: 100, resize: "vertical", lineHeight: 1.65 }} value={fPrompt} onChange={e => setFPrompt(e.target.value)} placeholder="Paste your full prompt here…" /></div>
+            <div style={s.field}>
+              <label style={s.fieldLabel}>Sample Output / Proof of Quality</label>
+              <textarea style={{ ...s.fieldInput, minHeight: 90, resize: "vertical", lineHeight: 1.65 }} value={fSample} onChange={e => setFSample(e.target.value)} placeholder="Paste a sample result your prompt produced…" />
+              <div style={{ fontSize: 11, color: "var(--subtle)", marginTop: 6 }}>💡 Shown to buyers before they pay. Required.</div>
+            </div>
             <button onClick={handleUpload} disabled={uploading} style={{ ...s.btnPink, cursor: uploading ? "not-allowed" : "pointer" }}>
               {uploading ? "⏳ Uploading to Shelby..." : "⚡ Upload to Shelby Network"}
             </button>
