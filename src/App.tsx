@@ -10,6 +10,7 @@ function addrToString(address: unknown): string {
 }
 
 const CATEGORIES = ["All", "Midjourney", "ChatGPT", "Claude", "Stable Diffusion", "Gemini", "Other"];
+const MAX_SAMPLE = 2000;
 
 const SAMPLE_PROMPTS: PromptRow[] = [
   { id: 1, title: "Cinematic Midjourney V6 Prompt", category: "Midjourney", price: "0.0008", preview: "A breathtaking cyberpunk cityscape at night, neon signs reflected in wet streets, flying cars…", full_prompt: "A breathtaking cyberpunk city at night, neon signs reflected in wet streets, flying cars weaving between glass skyscrapers, ultra-detailed, cinematic lighting, 8k --ar 16:9 --v 6 --style raw", sample_output: "Generated a stunning 8K cyberpunk cityscape with vivid neon reflections, dramatic lighting, and photorealistic flying vehicles. The image had a cinematic aspect ratio perfect for wallpapers and presentations.", creator: "0xA1B2...C3D4", blob_url: "" },
@@ -106,7 +107,7 @@ export default function App() {
       setPrompts(prev => [newPrompt, ...prev]);
       setFTitle(""); setFCat("Midjourney"); setFPrice(""); setFPrompt(""); setFSample("");
       setShowUpload(false);
-      showToast(blobUrl ? "✓ Prompt stored on Shelby network! 🎉" : "✓ Prompt uploaded!");
+      showToast(blobUrl ? "Prompt stored on Shelby network!" : "Prompt uploaded!");
     } catch (e: any) {
       showToast("Upload failed: " + (e?.message || "Unknown error"));
     } finally {
@@ -131,14 +132,14 @@ export default function App() {
         },
       });
       setUnlocked(prev => [...prev, prompt.id]);
-      showToast("✓ Payment confirmed · On-chain · Aptos Testnet");
+      showToast("Payment confirmed · On-chain · Aptos Testnet");
     } catch (e: any) {
       const msg = e?.message || "";
       if (msg.includes("rejected") || msg.includes("cancel") || e?.code === 4001) {
         showToast("Transaction cancelled.");
       } else {
         setUnlocked(prev => [...prev, prompt.id]);
-        showToast("✓ Unlocked · Demo mode");
+        showToast("Unlocked · Demo mode");
       }
     } finally {
       setPaying(false);
@@ -150,6 +151,14 @@ export default function App() {
     const matchSearch = !search || p.title.toLowerCase().includes(search.toLowerCase()) || p.category.toLowerCase().includes(search.toLowerCase());
     const matchTab = activeTab === "all" || p.creator === shortAddr;
     return matchCat && matchSearch && matchTab;
+  });
+
+  const sampleCounter = (len: number) => ({
+    fontSize: 11,
+    color: len > MAX_SAMPLE * 0.9 ? "var(--pink)" : "var(--subtle)",
+    marginTop: 6,
+    display: "flex",
+    justifyContent: "space-between" as const,
   });
 
   const s: Record<string, React.CSSProperties> = {
@@ -198,7 +207,7 @@ export default function App() {
           <button style={{ ...s.btnGhost, cursor: "pointer" }} onClick={() => document.getElementById("browse")?.scrollIntoView({ behavior: "smooth" })}>Browse</button>
           <button style={{ ...s.btnGhost, cursor: "pointer" }} onClick={() => setShowUpload(true)}>Sell Prompts</button>
           <button style={{ ...s.btnConnect, cursor: "pointer" }} onClick={handleWallet}>
-             {connected ? shortAddr : "Connect Wallet"}
+            {connected ? shortAddr : "Connect Wallet"}
           </button>
         </div>
       </nav>
@@ -269,7 +278,7 @@ export default function App() {
                 <div style={{ fontSize: 13, color: "var(--muted)", lineHeight: 1.65, marginBottom: 12 }}>{p.preview}</div>
                 {p.sample_output && (
                   <div style={{ fontSize: 11, color: "var(--green)", background: "var(--greenbg)", border: "1px solid rgba(13,122,78,0.15)", borderRadius: 6, padding: "4px 10px", marginBottom: 14, display: "inline-block" }}>
-                    ✓ Proof of output available
+                    Proof of output available
                   </div>
                 )}
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -278,7 +287,7 @@ export default function App() {
                 </div>
                 {p.blob_url && (
                   <div style={{ marginTop: 10, fontSize: 11, color: "var(--subtle)", display: "flex", alignItems: "center", gap: 4 }}>
-                    ⚡ Stored on Shelby
+                    Stored on Shelby
                   </div>
                 )}
               </div>
@@ -302,11 +311,14 @@ export default function App() {
             <div style={s.field}><label style={s.fieldLabel}>Full Prompt</label><textarea style={{ ...s.fieldInput, minHeight: 130, resize: "vertical", lineHeight: 1.65 }} value={fPrompt} onChange={e => setFPrompt(e.target.value)} placeholder="Paste your full prompt here…" /></div>
             <div style={s.field}>
               <label style={s.fieldLabel}>Sample Output / Proof of Quality</label>
-              <textarea style={{ ...s.fieldInput, minHeight: 100, resize: "vertical", lineHeight: 1.65 }} value={fSample} onChange={e => setFSample(e.target.value)} placeholder="Paste a sample result your prompt produced — this is shown to buyers BEFORE they pay, so they can verify quality…" />
-              <div style={{ fontSize: 11, color: "var(--subtle)", marginTop: 6 }}>💡 A good sample output increases conversions. Be specific about what the prompt produced.</div>
+              <textarea maxLength={MAX_SAMPLE} style={{ ...s.fieldInput, minHeight: 100, resize: "vertical", lineHeight: 1.65 }} value={fSample} onChange={e => setFSample(e.target.value)} placeholder="Paste a sample result your prompt produced — this is shown to buyers BEFORE they pay, so they can verify quality…" />
+              <div style={sampleCounter(fSample.length)}>
+                <span>Shown to buyers before they pay. Required.</span>
+                <span>{fSample.length} / {MAX_SAMPLE}</span>
+              </div>
             </div>
             <button onClick={handleUpload} disabled={uploading} style={{ ...s.btnPink, cursor: uploading ? "not-allowed" : "pointer", opacity: uploading ? 0.7 : 1 }}>
-              {uploading ? "⏳ Uploading to Shelby..." : "⚡ Upload to Shelby Network"}
+              {uploading ? "Uploading to Shelby..." : "Upload to Shelby Network"}
             </button>
           </div>
         </div>
@@ -328,20 +340,21 @@ export default function App() {
         <div style={s.overlay} onClick={e => e.target === e.currentTarget && setActivePrompt(null)}>
           <div style={s.modal}>
             <button style={{ ...s.modalX, cursor: "pointer" }} onClick={() => setActivePrompt(null)}>✕</button>
-
-            {/* Header */}
             <span style={s.catTag}>{activePrompt.category}</span>
             <h4 style={{ fontFamily: "Syne, sans-serif", fontSize: 20, fontWeight: 800, margin: "12px 0 4px", letterSpacing: "-0.02em" }}>{activePrompt.title}</h4>
-            <p style={{ fontSize: 12, color: "var(--subtle)", marginBottom: 20 }}>by {activePrompt.creator} {activePrompt.blob_url && <span style={{ color: "var(--green)", marginLeft: 8 }}>⚡ On Shelby</span>}</p>
+            <p style={{ fontSize: 12, color: "var(--subtle)", marginBottom: 20 }}>
+              by {activePrompt.creator}
+              {activePrompt.blob_url && <span style={{ color: "var(--green)", marginLeft: 8 }}>On Shelby</span>}
+            </p>
 
             {/* Modal tabs */}
             {!unlocked.includes(activePrompt.id) && (
               <div style={{ display: "flex", gap: 3, background: "var(--surface2)", border: "1px solid var(--border)", borderRadius: 10, padding: 3, marginBottom: 22 }}>
                 <button onClick={() => setModalTab("proof")} style={{ flex: 1, fontSize: 13, fontWeight: 600, color: modalTab === "proof" ? "var(--text)" : "var(--muted)", background: modalTab === "proof" ? "#fff" : "none", border: "none", borderRadius: 7, padding: "8px 16px", cursor: "pointer", boxShadow: modalTab === "proof" ? "0 1px 3px rgba(0,0,0,0.08)" : "none" }}>
-                  👁 Proof of Output
+                  Proof of Output
                 </button>
                 <button onClick={() => setModalTab("unlock")} style={{ flex: 1, fontSize: 13, fontWeight: 600, color: modalTab === "unlock" ? "var(--text)" : "var(--muted)", background: modalTab === "unlock" ? "#fff" : "none", border: "none", borderRadius: 7, padding: "8px 16px", cursor: "pointer", boxShadow: modalTab === "unlock" ? "0 1px 3px rgba(0,0,0,0.08)" : "none" }}>
-                  🔓 Unlock Prompt
+                  Unlock Prompt
                 </button>
               </div>
             )}
@@ -356,7 +369,7 @@ export default function App() {
                 <div style={{ background: "var(--pinkbg)", border: "1px solid var(--pinkbr)", borderRadius: 12, padding: "14px 18px", marginBottom: 20 }}>
                   <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, color: "var(--pink)", marginBottom: 8 }}>Prompt Preview (blurred)</div>
                   <p style={{ fontSize: 14, color: "var(--text)", lineHeight: 1.7, filter: "blur(4px)", userSelect: "none" as const }}>{activePrompt.full_prompt.slice(0, 120)}…</p>
-                  <p style={{ fontSize: 11, color: "var(--muted)", marginTop: 8 }}>🔒 Unlock to see the full prompt</p>
+                  <p style={{ fontSize: 11, color: "var(--muted)", marginTop: 8 }}>Unlock to see the full prompt</p>
                 </div>
                 <button onClick={() => setModalTab("unlock")} style={{ ...s.btnPink, cursor: "pointer" }}>
                   Looks good — Unlock for {activePrompt.price} SUSD →
@@ -373,10 +386,10 @@ export default function App() {
                   <div><span style={{ fontFamily: "Syne, sans-serif", fontSize: 24, fontWeight: 700, color: "var(--pink)" }}>{activePrompt.price}</span><span style={{ fontSize: 12, color: "var(--subtle)", marginLeft: 4 }}>ShelbyUSD</span></div>
                 </div>
                 <div style={{ fontSize: 13, color: "var(--muted)", marginBottom: 18, lineHeight: 1.6 }}>
-                   Not sure yet? <button onClick={() => setModalTab("proof")} style={{ color: "var(--pink)", background: "none", border: "none", fontSize: 13, cursor: "pointer", textDecoration: "underline" }}>View proof of output first</button>
+                  Not sure yet? <button onClick={() => setModalTab("proof")} style={{ color: "var(--pink)", background: "none", border: "none", fontSize: 13, cursor: "pointer", textDecoration: "underline" }}>View proof of output first</button>
                 </div>
                 <button onClick={() => handleUnlock(activePrompt)} disabled={paying} style={{ ...s.btnPink, cursor: paying ? "not-allowed" : "pointer", opacity: paying ? 0.7 : 1 }}>
-                  {paying ? " Waiting for Petra..." : "🔓 Pay & Unlock"}
+                  {paying ? "Waiting for Petra..." : "Pay & Unlock"}
                 </button>
                 <button onClick={() => setActivePrompt(null)} style={{ ...s.btnSec, cursor: "pointer" }}>Cancel</button>
               </div>
@@ -386,13 +399,21 @@ export default function App() {
             {unlocked.includes(activePrompt.id) && (
               <div>
                 <div style={{ display: "flex", alignItems: "center", gap: 9, background: "var(--greenbg)", border: "1px solid rgba(13,122,78,0.2)", borderRadius: 10, padding: "11px 16px", marginBottom: 18, fontSize: 12, fontWeight: 600, color: "var(--green)" }}>
-                  ✅ Unlocked · On-chain proof recorded · Aptos Testnet
+                  Unlocked · On-chain proof recorded · Aptos Testnet
                 </div>
                 <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: 20, marginBottom: 18 }}>
                   <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, color: "var(--subtle)", marginBottom: 10 }}>Full Prompt</div>
                   <pre style={{ fontFamily: "DM Sans, sans-serif", fontSize: 13, color: "var(--text)", whiteSpace: "pre-wrap", lineHeight: 1.75 }}>{activePrompt.full_prompt}</pre>
                 </div>
-                <button onClick={() => { const blob = new Blob([activePrompt.full_prompt], { type: "text/plain" }); const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = activePrompt.title.replace(/[^a-z0-9]/gi, "_").toLowerCase() + ".txt"; a.click(); URL.revokeObjectURL(url); }} style={{ ...s.btnPink, background: "var(--surface2)", color: "var(--text)", boxShadow: "none", cursor: "pointer" }}>⬇ Download .txt</button>
+                <button onClick={() => {
+                  const blob = new Blob([activePrompt.full_prompt], { type: "text/plain" });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = url;
+                  a.download = activePrompt.title.replace(/[^a-z0-9]/gi, "_").toLowerCase() + ".txt";
+                  a.click();
+                  URL.revokeObjectURL(url);
+                }} style={{ ...s.btnPink, background: "var(--surface2)", color: "var(--text)", boxShadow: "none", cursor: "pointer" }}>Download .txt</button>
                 <button onClick={() => setActivePrompt(null)} style={{ ...s.btnSec, cursor: "pointer" }}>Close</button>
               </div>
             )}
@@ -415,11 +436,14 @@ export default function App() {
             <div style={s.field}><label style={s.fieldLabel}>Full Prompt</label><textarea style={{ ...s.fieldInput, minHeight: 100, resize: "vertical", lineHeight: 1.65 }} value={fPrompt} onChange={e => setFPrompt(e.target.value)} placeholder="Paste your full prompt here…" /></div>
             <div style={s.field}>
               <label style={s.fieldLabel}>Sample Output / Proof of Quality</label>
-              <textarea style={{ ...s.fieldInput, minHeight: 90, resize: "vertical", lineHeight: 1.65 }} value={fSample} onChange={e => setFSample(e.target.value)} placeholder="Paste a sample result your prompt produced…" />
-              <div style={{ fontSize: 11, color: "var(--subtle)", marginTop: 6 }}> Shown to buyers before they pay. Required.</div>
+              <textarea maxLength={MAX_SAMPLE} style={{ ...s.fieldInput, minHeight: 90, resize: "vertical", lineHeight: 1.65 }} value={fSample} onChange={e => setFSample(e.target.value)} placeholder="Paste a sample result your prompt produced…" />
+              <div style={sampleCounter(fSample.length)}>
+                <span>Shown to buyers before they pay. Required.</span>
+                <span>{fSample.length} / {MAX_SAMPLE}</span>
+              </div>
             </div>
             <button onClick={handleUpload} disabled={uploading} style={{ ...s.btnPink, cursor: uploading ? "not-allowed" : "pointer" }}>
-              {uploading ? " Uploading to Shelby..." : "⚡ Upload to Shelby Network"}
+              {uploading ? "Uploading to Shelby..." : "Upload to Shelby Network"}
             </button>
             <button onClick={() => setShowUpload(false)} style={{ ...s.btnSec, cursor: "pointer" }}>Cancel</button>
           </div>
