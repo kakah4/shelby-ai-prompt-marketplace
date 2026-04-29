@@ -198,7 +198,7 @@ export default function App() {
           <button style={{ ...s.btnGhost, cursor: "pointer" }} onClick={() => document.getElementById("browse")?.scrollIntoView({ behavior: "smooth" })}>Browse</button>
           <button style={{ ...s.btnGhost, cursor: "pointer" }} onClick={() => setShowUpload(true)}>Sell Prompts</button>
           <button style={{ ...s.btnConnect, cursor: "pointer" }} onClick={handleWallet}>
-            💳 {connected ? shortAddr : "Connect Wallet"}
+             {connected ? shortAddr : "Connect Wallet"}
           </button>
         </div>
       </nav>
@@ -373,10 +373,10 @@ export default function App() {
                   <div><span style={{ fontFamily: "Syne, sans-serif", fontSize: 24, fontWeight: 700, color: "var(--pink)" }}>{activePrompt.price}</span><span style={{ fontSize: 12, color: "var(--subtle)", marginLeft: 4 }}>ShelbyUSD</span></div>
                 </div>
                 <div style={{ fontSize: 13, color: "var(--muted)", marginBottom: 18, lineHeight: 1.6 }}>
-                  💡 Not sure yet? <button onClick={() => setModalTab("proof")} style={{ color: "var(--pink)", background: "none", border: "none", fontSize: 13, cursor: "pointer", textDecoration: "underline" }}>View proof of output first</button>
+                   Not sure yet? <button onClick={() => setModalTab("proof")} style={{ color: "var(--pink)", background: "none", border: "none", fontSize: 13, cursor: "pointer", textDecoration: "underline" }}>View proof of output first</button>
                 </div>
                 <button onClick={() => handleUnlock(activePrompt)} disabled={paying} style={{ ...s.btnPink, cursor: paying ? "not-allowed" : "pointer", opacity: paying ? 0.7 : 1 }}>
-                  {paying ? "⏳ Waiting for Petra..." : "🔓 Pay & Unlock"}
+                  {paying ? " Waiting for Petra..." : "🔓 Pay & Unlock"}
                 </button>
                 <button onClick={() => setActivePrompt(null)} style={{ ...s.btnSec, cursor: "pointer" }}>Cancel</button>
               </div>
@@ -416,10 +416,10 @@ export default function App() {
             <div style={s.field}>
               <label style={s.fieldLabel}>Sample Output / Proof of Quality</label>
               <textarea style={{ ...s.fieldInput, minHeight: 90, resize: "vertical", lineHeight: 1.65 }} value={fSample} onChange={e => setFSample(e.target.value)} placeholder="Paste a sample result your prompt produced…" />
-              <div style={{ fontSize: 11, color: "var(--subtle)", marginTop: 6 }}>💡 Shown to buyers before they pay. Required.</div>
+              <div style={{ fontSize: 11, color: "var(--subtle)", marginTop: 6 }}> Shown to buyers before they pay. Required.</div>
             </div>
             <button onClick={handleUpload} disabled={uploading} style={{ ...s.btnPink, cursor: uploading ? "not-allowed" : "pointer" }}>
-              {uploading ? "⏳ Uploading to Shelby..." : "⚡ Upload to Shelby Network"}
+              {uploading ? " Uploading to Shelby..." : "⚡ Upload to Shelby Network"}
             </button>
             <button onClick={() => setShowUpload(false)} style={{ ...s.btnSec, cursor: "pointer" }}>Cancel</button>
           </div>
