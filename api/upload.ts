@@ -15,6 +15,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const client = new ShelbyNodeClient({ network: Network.SHELBYNET, apiKey });
     const signer = Account.fromPrivateKey({ privateKey: new Ed25519PrivateKey(privateKey) });
+    res.setHeader('X-Signer-Address', signer.accountAddress.toString());
+    console.log("SIGNER:", signer.accountAddress.toString());
     console.log("Signer address:", signer.accountAddress.toString());
     const blobData = new TextEncoder().encode(promptText);
     const TIME_TO_LIVE = 365 * 24 * 60 * 60 * 1_000_000;
