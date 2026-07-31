@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { fetchPrompts, insertPrompt, type PromptRow } from "./supabase";
 
@@ -9,16 +9,30 @@ function addrToString(address: unknown): string {
   return String(address);
 }
 
+function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const result = reader.result as string;
+      // strip the data:...;base64, prefix
+      resolve(result.split(",")[1]);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 const CATEGORIES = ["All", "Midjourney", "ChatGPT", "Claude", "Stable Diffusion", "Gemini", "Other"];
 const MAX_SAMPLE = 2000;
+const MAX_IMAGE_MB = 5;
 
 const SAMPLE_PROMPTS: PromptRow[] = [
-  { id: 1, title: "Cinematic Midjourney V6 Prompt", category: "Midjourney", price: "0.0008", preview: "A breathtaking cyberpunk cityscape at night, neon signs reflected in wet streets, flying cars…", full_prompt: "A breathtaking cyberpunk city at night, neon signs reflected in wet streets, flying cars weaving between glass skyscrapers, ultra-detailed, cinematic lighting, 8k --ar 16:9 --v 6 --style raw", sample_output: "Generated a stunning 8K cyberpunk cityscape with vivid neon reflections, dramatic lighting, and photorealistic flying vehicles. The image had a cinematic aspect ratio perfect for wallpapers and presentations.", creator: "0xA1B2...C3D4", blob_url: "" },
-  { id: 2, title: "Cold Email Master Template", category: "Claude", price: "0.0005", preview: "Expert business communicator. Write concise, compelling cold emails that convert…", full_prompt: "You are an expert business communicator. Write a concise, compelling cold email to [TARGET] at [COMPANY] about [PRODUCT]. Open with a personalized hook, state the value in one sentence, include social proof, end with a low-commitment CTA. Under 150 words.", sample_output: "Subject: Quick question about [COMPANY]'s data pipeline\n\nHi Sarah,\n\nNoticed [COMPANY] recently scaled to 500+ engineers — congrats. Most teams at that stage hit serious bottlenecks with data orchestration.\n\nWe helped Stripe cut pipeline failures by 60% in 90 days.\n\nWorth a 15-min call this week?\n\nBest, [NAME]", creator: "0xE5F6...G7H8", blob_url: "" },
-  { id: 3, title: "Deep Work Productivity System", category: "ChatGPT", price: "0.0012", preview: "Elite productivity coach trained in GTD, time-blocking and deep work. Identifies bottlenecks…", full_prompt: "You are an elite productivity coach trained in GTD, time-blocking, and deep work. I will describe my goals and workload. 1) Identify my top 3 bottlenecks. 2) Design a weekly time-block schedule. 3) Suggest one keystone habit. 4) Give a 30-day accountability framework.", sample_output: "After analyzing your workload: Your top 3 bottlenecks are context-switching, unclear priorities, and reactive email habits. Recommended schedule: 6-9AM deep work block (no notifications), 9-11AM meetings, 2-4PM creative work. Keystone habit: Daily 5-min shutdown ritual listing tomorrow's top 3 tasks.", creator: "0xI9J0...K1L2", blob_url: "" },
-  { id: 4, title: "Anime Portrait — Cyberpunk Style", category: "Stable Diffusion", price: "0.0007", preview: "Beautiful anime character, silver hair, glowing violet eyes, futuristic cyberpunk neon Tokyo…", full_prompt: "beautiful anime girl, long silver hair, glowing violet eyes, futuristic cyberpunk outfit, neon Tokyo street background, masterpiece, best quality, ultra-detailed, 8k --neg lowres, bad anatomy, worst quality", sample_output: "Produced a stunning anime portrait with perfect anatomy, vibrant violet eyes with realistic glow effects, detailed silver hair with individual strand rendering, and a neon-lit Tokyo backdrop with depth of field blur.", creator: "0xM3N4...O5P6", blob_url: "" },
-  { id: 5, title: "React Component Code Generator", category: "ChatGPT", price: "0.0006", preview: "Generate production-ready React components with TypeScript, Tailwind CSS and full accessibility…", full_prompt: "Generate a production-ready React component for [FEATURE]. Requirements: TypeScript, Tailwind CSS, WCAG AA accessible, mobile-first, no extra dependencies. Include TypeScript interfaces, error boundary, loading/empty states.", sample_output: "Generated a fully typed React component with proper TypeScript interfaces, Tailwind responsive classes, ARIA labels, keyboard navigation support, loading skeleton, empty state illustration, and error boundary with retry logic. Zero additional dependencies.", creator: "0xQ7R8...S9T0", blob_url: "" },
-  { id: 6, title: "Afrofuturist Sci-Fi Story Writer", category: "Claude", price: "0.0009", preview: "1200-word sci-fi set in Lagos 2087. First person, present tense, afrofuturist aesthetic…", full_prompt: "Write a 1200-word sci-fi story set in Lagos, Nigeria in 2087. Protagonist: Amara Osei, 28-year-old AI engineer who discovers her consciousness was secretly uploaded to a government supercomputer. Voice: literary fiction, first person present, afrofuturist.", sample_output: "The story opens with Amara debugging neural interfaces in Victoria Island's floating tech district, before she discovers fragmented memories that aren't hers. Rich with Yoruba proverbs, Afrobeat references, and vivid descriptions of Lagos' transformation into Africa's AI capital. Received 4.9/5 stars from beta readers.", creator: "0xU1V2...W3X4", blob_url: "" },
+  { id: 1, title: "Cinematic Midjourney V6 Prompt", category: "Midjourney", price: "0.0008", preview: "A breathtaking cyberpunk cityscape at night, neon signs reflected in wet streets, flying cars…", full_prompt: "A breathtaking cyberpunk city at night, neon signs reflected in wet streets, flying cars weaving between glass skyscrapers, ultra-detailed, cinematic lighting, 8k --ar 16:9 --v 6 --style raw", sample_output: "Generated a stunning 8K cyberpunk cityscape with vivid neon reflections, dramatic lighting, and photorealistic flying vehicles. The image had a cinematic aspect ratio perfect for wallpapers and presentations.", proof_image_url: "", creator: "0xA1B2...C3D4", blob_url: "" },
+  { id: 2, title: "Cold Email Master Template", category: "Claude", price: "0.0005", preview: "Expert business communicator. Write concise, compelling cold emails that convert…", full_prompt: "You are an expert business communicator. Write a concise, compelling cold email to [TARGET] at [COMPANY] about [PRODUCT]. Open with a personalized hook, state the value in one sentence, include social proof, end with a low-commitment CTA. Under 150 words.", sample_output: "Subject: Quick question about [COMPANY]'s data pipeline\n\nHi Sarah,\n\nNoticed [COMPANY] recently scaled to 500+ engineers — congrats. Most teams at that stage hit serious bottlenecks with data orchestration.\n\nWe helped Stripe cut pipeline failures by 60% in 90 days.\n\nWorth a 15-min call this week?\n\nBest, [NAME]", proof_image_url: "", creator: "0xE5F6...G7H8", blob_url: "" },
+  { id: 3, title: "Deep Work Productivity System", category: "ChatGPT", price: "0.0012", preview: "Elite productivity coach trained in GTD, time-blocking and deep work. Identifies bottlenecks…", full_prompt: "You are an elite productivity coach trained in GTD, time-blocking, and deep work. I will describe my goals and workload. 1) Identify my top 3 bottlenecks. 2) Design a weekly time-block schedule. 3) Suggest one keystone habit. 4) Give a 30-day accountability framework.", sample_output: "After analyzing your workload: Your top 3 bottlenecks are context-switching, unclear priorities, and reactive email habits. Recommended schedule: 6-9AM deep work block (no notifications), 9-11AM meetings, 2-4PM creative work. Keystone habit: Daily 5-min shutdown ritual listing tomorrow's top 3 tasks.", proof_image_url: "", creator: "0xI9J0...K1L2", blob_url: "" },
+  { id: 4, title: "Anime Portrait — Cyberpunk Style", category: "Stable Diffusion", price: "0.0007", preview: "Beautiful anime character, silver hair, glowing violet eyes, futuristic cyberpunk neon Tokyo…", full_prompt: "beautiful anime girl, long silver hair, glowing violet eyes, futuristic cyberpunk outfit, neon Tokyo street background, masterpiece, best quality, ultra-detailed, 8k --neg lowres, bad anatomy, worst quality", sample_output: "Produced a stunning anime portrait with perfect anatomy, vibrant violet eyes with realistic glow effects, detailed silver hair with individual strand rendering, and a neon-lit Tokyo backdrop with depth of field blur.", proof_image_url: "", creator: "0xM3N4...O5P6", blob_url: "" },
+  { id: 5, title: "React Component Code Generator", category: "ChatGPT", price: "0.0006", preview: "Generate production-ready React components with TypeScript, Tailwind CSS and full accessibility…", full_prompt: "Generate a production-ready React component for [FEATURE]. Requirements: TypeScript, Tailwind CSS, WCAG AA accessible, mobile-first, no extra dependencies. Include TypeScript interfaces, error boundary, loading/empty states.", sample_output: "Generated a fully typed React component with proper TypeScript interfaces, Tailwind responsive classes, ARIA labels, keyboard navigation support, loading skeleton, empty state illustration, and error boundary with retry logic. Zero additional dependencies.", proof_image_url: "", creator: "0xQ7R8...S9T0", blob_url: "" },
+  { id: 6, title: "Afrofuturist Sci-Fi Story Writer", category: "Claude", price: "0.0009", preview: "1200-word sci-fi set in Lagos 2087. First person, present tense, afrofuturist aesthetic…", full_prompt: "Write a 1200-word sci-fi story set in Lagos, Nigeria in 2087. Protagonist: Amara Osei, 28-year-old AI engineer who discovers her consciousness was secretly uploaded to a government supercomputer. Voice: literary fiction, first person present, afrofuturist.", sample_output: "The story opens with Amara debugging neural interfaces in Victoria Island's floating tech district, before she discovers fragmented memories that aren't hers. Rich with Yoruba proverbs, Afrobeat references, and vivid descriptions of Lagos' transformation into Africa's AI capital. Received 4.9/5 stars from beta readers.", proof_image_url: "", creator: "0xU1V2...W3X4", blob_url: "" },
 ];
 
 const SHELBY_USD_ADDRESS = "0x1b18363a9f1fe5e6ebf247daba5cc1c18052bb232efdc4c50f556053922d98e1";
@@ -45,6 +59,9 @@ export default function App() {
   const [fPrice, setFPrice] = useState("");
   const [fPrompt, setFPrompt] = useState("");
   const [fSample, setFSample] = useState("");
+  const [fImageFile, setFImageFile] = useState<File | null>(null);
+  const [fImagePreview, setFImagePreview] = useState<string>("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetchPrompts().then(rows => {
@@ -72,6 +89,20 @@ export default function App() {
     setModalTab("proof");
   };
 
+  const handleImagePick = (file: File | null) => {
+    if (!file) { setFImageFile(null); setFImagePreview(""); return; }
+    if (!file.type.startsWith("image/")) { showToast("Please choose an image file."); return; }
+    if (file.size > MAX_IMAGE_MB * 1024 * 1024) { showToast(`Image must be under ${MAX_IMAGE_MB}MB.`); return; }
+    setFImageFile(file);
+    setFImagePreview(URL.createObjectURL(file));
+  };
+
+  const resetForm = () => {
+    setFTitle(""); setFCat("Midjourney"); setFPrice(""); setFPrompt(""); setFSample("");
+    setFImageFile(null); setFImagePreview("");
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
   const handleUpload = async () => {
     if (!connected) { showToast("Connect your wallet first."); return; }
     if (!fTitle.trim()) { showToast("Enter a title."); return; }
@@ -82,14 +113,33 @@ export default function App() {
     showToast("Uploading to Shelby network...");
 
     try {
-      const blobName = `prompts/${Date.now()}_${fTitle.trim().replace(/[^a-zA-Z0-9]/g, "_")}.txt`;
-      const shelbyRes = await fetch("/api/upload", {
+      const safeTitle = fTitle.trim().replace(/[^a-zA-Z0-9]/g, "_");
+      const promptBlobName = `prompts/${Date.now()}_${safeTitle}.txt`;
+
+      const promptRes = await fetch("/api/upload", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ promptText: fPrompt.trim(), blobName }),
+        body: JSON.stringify({ promptText: fPrompt.trim(), blobName: promptBlobName }),
       });
-      const shelbyData = await shelbyRes.json();
-      const blobUrl = shelbyData.blobUrl || "";
+      const promptData = await promptRes.json();
+      const blobUrl = promptData.blobUrl || "";
+
+      // Upload proof image to Shelby too, if provided
+      let proofImageUrl = "";
+      if (fImageFile) {
+        showToast("Uploading proof image to Shelby...");
+        const base64Data = await fileToBase64(fImageFile);
+        const ext = fImageFile.name.split(".").pop() || "jpg";
+        const imageBlobName = `proofs/${Date.now()}_${safeTitle}.${ext}`;
+
+        const imgRes = await fetch("/api/upload", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ base64Data, blobName: imageBlobName, contentType: fImageFile.type }),
+        });
+        const imgData = await imgRes.json();
+        proofImageUrl = imgData.blobUrl || "";
+      }
 
       const newPrompt: PromptRow = {
         id: Date.now(),
@@ -99,13 +149,14 @@ export default function App() {
         preview: fPrompt.trim().slice(0, 100) + "…",
         full_prompt: fPrompt.trim(),
         sample_output: fSample.trim(),
+        proof_image_url: proofImageUrl,
         creator: shortAddr || "0xUnknown",
         blob_url: blobUrl,
       };
 
       await insertPrompt(newPrompt);
       setPrompts(prev => [newPrompt, ...prev]);
-      setFTitle(""); setFCat("Midjourney"); setFPrice(""); setFPrompt(""); setFSample("");
+      resetForm();
       setShowUpload(false);
       showToast(blobUrl ? "Prompt stored on Shelby network!" : "Prompt uploaded!");
     } catch (e: any) {
@@ -181,7 +232,8 @@ export default function App() {
     section: { maxWidth: 1140, margin: "0 auto", padding: "80px 48px" },
     sectionTitle: { fontFamily: "Syne, sans-serif", fontSize: 22, fontWeight: 700, letterSpacing: "-0.02em" },
     grid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: 16 },
-    card: { background: "#fff", border: "1px solid var(--border)", borderRadius: 18, padding: 26, cursor: "pointer", transition: "all 0.2s" },
+    card: { background: "#fff", border: "1px solid var(--border)", borderRadius: 18, padding: 26, cursor: "pointer", transition: "all 0.2s", overflow: "hidden" as const },
+    cardImg: { width: "calc(100% + 52px)", margin: "-26px -26px 16px -26px", height: 160, objectFit: "cover" as const, display: "block" },
     catTag: { fontSize: 11, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase" as const, color: "var(--pink)", background: "var(--pinkbg)", border: "1px solid var(--pinkbr)", padding: "3px 10px", borderRadius: 6 },
     overlay: { display: "flex", position: "fixed", inset: 0, zIndex: 300, background: "rgba(0,0,0,0.5)", backdropFilter: "blur(12px)", alignItems: "center", justifyContent: "center", padding: 20 },
     modal: { background: "#fff", border: "1px solid var(--border2)", borderRadius: 22, width: "100%", maxWidth: 560, padding: 36, position: "relative" as const, maxHeight: "92vh", overflowY: "auto" as const },
@@ -192,6 +244,7 @@ export default function App() {
     btnPink: { fontFamily: "DM Sans, sans-serif", fontSize: 15, fontWeight: 700, width: "100%", padding: 15, background: "var(--pink)", color: "#fff", border: "none", borderRadius: 12, marginBottom: 10, boxShadow: "0 4px 20px rgba(255,45,120,0.25)" },
     btnSec: { fontFamily: "DM Sans, sans-serif", fontSize: 13, fontWeight: 500, width: "100%", padding: 12, background: "transparent", color: "var(--muted)", border: "1px solid var(--border2)", borderRadius: 12 },
     toast: { position: "fixed" as const, bottom: 28, right: 28, zIndex: 400, background: "var(--text)", color: "#fff", fontSize: 13, fontWeight: 600, padding: "13px 22px", borderRadius: 12, transition: "all 0.38s cubic-bezier(0.34,1.56,0.64,1)", pointerEvents: "none" as const, opacity: toast ? 1 : 0, transform: toast ? "translateY(0)" : "translateY(80px)", maxWidth: 400 },
+    imgDrop: { border: "2px dashed var(--border2)", borderRadius: 12, padding: 20, textAlign: "center" as const, cursor: "pointer", background: "var(--surface)" },
   };
 
   return (
@@ -224,7 +277,7 @@ export default function App() {
         <div style={s.heroContent}>
           <div style={s.heroPill}>
             <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--pink)", display: "inline-block", animation: "pulse 2s infinite" }} />
-            Live on Shelby Testnet &nbsp;·&nbsp; Aptos
+            Live on Shelby &nbsp;·&nbsp; Aptos
           </div>
           <h1 style={s.heroH1}>The marketplace for<br /><span style={{ background: "linear-gradient(90deg, #ff2d78, #ff9cc8)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>prompts that work</span></h1>
           <p style={s.heroP}>Buy and sell battle-tested AI prompts. Every transaction verified on-chain. Creators earn directly — no platform cuts.</p>
@@ -270,17 +323,27 @@ export default function App() {
               <div key={p.id} style={s.card} onClick={() => openModal(p)}
                 onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.borderColor = "var(--pinkbr)"; (e.currentTarget as HTMLDivElement).style.transform = "translateY(-2px)"; (e.currentTarget as HTMLDivElement).style.boxShadow = "0 8px 40px rgba(255,45,120,0.08)"; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = "var(--border)"; (e.currentTarget as HTMLDivElement).style.transform = "none"; (e.currentTarget as HTMLDivElement).style.boxShadow = "none"; }}>
+                {p.proof_image_url && (
+                  <img src={p.proof_image_url} alt={p.title} style={s.cardImg} />
+                )}
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
                   <span style={s.catTag}>{p.category}</span>
                   <span style={{ fontSize: 13, fontWeight: 700 }}>{p.price} <span style={{ fontSize: 11, color: "var(--subtle)" }}>SUSD</span></span>
                 </div>
                 <div style={{ fontFamily: "Syne, sans-serif", fontSize: 15, fontWeight: 700, lineHeight: 1.4, marginBottom: 8 }}>{p.title}</div>
                 <div style={{ fontSize: 13, color: "var(--muted)", lineHeight: 1.65, marginBottom: 12 }}>{p.preview}</div>
-                {p.sample_output && (
-                  <div style={{ fontSize: 11, color: "var(--green)", background: "var(--greenbg)", border: "1px solid rgba(13,122,78,0.15)", borderRadius: 6, padding: "4px 10px", marginBottom: 14, display: "inline-block" }}>
-                    Proof of output available
-                  </div>
-                )}
+                <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 14 }}>
+                  {p.sample_output && (
+                    <div style={{ fontSize: 11, color: "var(--green)", background: "var(--greenbg)", border: "1px solid rgba(13,122,78,0.15)", borderRadius: 6, padding: "4px 10px", display: "inline-block" }}>
+                      Written proof
+                    </div>
+                  )}
+                  {p.proof_image_url && (
+                    <div style={{ fontSize: 11, color: "var(--green)", background: "var(--greenbg)", border: "1px solid rgba(13,122,78,0.15)", borderRadius: 6, padding: "4px 10px", display: "inline-block" }}>
+                      Visual proof
+                    </div>
+                  )}
+                </div>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <span style={{ fontSize: 12, color: "var(--subtle)" }}>by {p.creator}</span>
                   <button onClick={e => { e.stopPropagation(); openModal(p); }} style={{ fontSize: 12, fontWeight: 600, color: "var(--pink)", background: "var(--pinkbg)", border: "1px solid var(--pinkbr)", borderRadius: 8, padding: "7px 14px", cursor: "pointer" }}>View & Unlock →</button>
@@ -317,6 +380,20 @@ export default function App() {
                 <span>{fSample.length} / {MAX_SAMPLE}</span>
               </div>
             </div>
+            <div style={s.field}>
+              <label style={s.fieldLabel}>Proof Image (optional)</label>
+              <div style={s.imgDrop} onClick={() => fileInputRef.current?.click()}>
+                {fImagePreview ? (
+                  <img src={fImagePreview} alt="preview" style={{ maxWidth: "100%", maxHeight: 180, borderRadius: 8, margin: "0 auto", display: "block" }} />
+                ) : (
+                  <div style={{ fontSize: 13, color: "var(--muted)" }}>Click to upload a screenshot or image of the result<br /><span style={{ fontSize: 11, color: "var(--subtle)" }}>PNG, JPG — under {MAX_IMAGE_MB}MB</span></div>
+                )}
+                <input ref={fileInputRef} type="file" accept="image/*" style={{ display: "none" }} onChange={e => handleImagePick(e.target.files?.[0] || null)} />
+              </div>
+              {fImagePreview && (
+                <button onClick={() => handleImagePick(null)} style={{ fontSize: 12, color: "var(--pink)", background: "none", border: "none", cursor: "pointer", marginTop: 8 }}>Remove image</button>
+              )}
+            </div>
             <button onClick={handleUpload} disabled={uploading} style={{ ...s.btnPink, cursor: uploading ? "not-allowed" : "pointer", opacity: uploading ? 0.7 : 1 }}>
               {uploading ? "Uploading to Shelby..." : "Upload to Shelby Network"}
             </button>
@@ -332,7 +409,7 @@ export default function App() {
             <a key={label} href={href} target="_blank" rel="noreferrer" style={{ fontSize: 13, color: "var(--subtle)" }}>{label}</a>
           ))}
         </div>
-        <span style={{ fontSize: 12, color: "var(--subtle)" }}>Built by Kakah4 · Shelby Testnet · Aptos</span>
+        <span style={{ fontSize: 12, color: "var(--subtle)" }}>Built by Kakah4 · Shelby · Aptos</span>
       </footer>
 
       {/* PROMPT MODAL */}
@@ -362,6 +439,9 @@ export default function App() {
             {/* PROOF TAB */}
             {!unlocked.includes(activePrompt.id) && modalTab === "proof" && (
               <div>
+                {activePrompt.proof_image_url && (
+                  <img src={activePrompt.proof_image_url} alt="proof" style={{ width: "100%", maxHeight: 320, objectFit: "cover", borderRadius: 12, marginBottom: 16, border: "1px solid var(--border)" }} />
+                )}
                 <div style={{ background: "var(--surface2)", border: "1px solid var(--border2)", borderRadius: 12, padding: "14px 18px", marginBottom: 16 }}>
                   <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, color: "var(--subtle)", marginBottom: 8 }}>What this prompt produces</div>
                   <p style={{ fontSize: 14, color: "var(--text)", lineHeight: 1.7 }}>{activePrompt.sample_output || "No sample output provided by creator."}</p>
@@ -398,6 +478,9 @@ export default function App() {
             {/* UNLOCKED VIEW */}
             {unlocked.includes(activePrompt.id) && (
               <div>
+                {activePrompt.proof_image_url && (
+                  <img src={activePrompt.proof_image_url} alt="proof" style={{ width: "100%", maxHeight: 280, objectFit: "cover", borderRadius: 12, marginBottom: 16, border: "1px solid var(--border)" }} />
+                )}
                 <div style={{ display: "flex", alignItems: "center", gap: 9, background: "var(--greenbg)", border: "1px solid rgba(13,122,78,0.2)", borderRadius: 10, padding: "11px 16px", marginBottom: 18, fontSize: 12, fontWeight: 600, color: "var(--green)" }}>
                   Unlocked · On-chain proof recorded · Aptos Testnet
                 </div>
@@ -441,6 +524,20 @@ export default function App() {
                 <span>Shown to buyers before they pay. Required.</span>
                 <span>{fSample.length} / {MAX_SAMPLE}</span>
               </div>
+            </div>
+            <div style={s.field}>
+              <label style={s.fieldLabel}>Proof Image (optional)</label>
+              <div style={s.imgDrop} onClick={() => fileInputRef.current?.click()}>
+                {fImagePreview ? (
+                  <img src={fImagePreview} alt="preview" style={{ maxWidth: "100%", maxHeight: 150, borderRadius: 8, margin: "0 auto", display: "block" }} />
+                ) : (
+                  <div style={{ fontSize: 13, color: "var(--muted)" }}>Click to upload a screenshot or image<br /><span style={{ fontSize: 11, color: "var(--subtle)" }}>Under {MAX_IMAGE_MB}MB</span></div>
+                )}
+                <input ref={fileInputRef} type="file" accept="image/*" style={{ display: "none" }} onChange={e => handleImagePick(e.target.files?.[0] || null)} />
+              </div>
+              {fImagePreview && (
+                <button onClick={() => handleImagePick(null)} style={{ fontSize: 12, color: "var(--pink)", background: "none", border: "none", cursor: "pointer", marginTop: 8 }}>Remove image</button>
+              )}
             </div>
             <button onClick={handleUpload} disabled={uploading} style={{ ...s.btnPink, cursor: uploading ? "not-allowed" : "pointer" }}>
               {uploading ? "Uploading to Shelby..." : "Upload to Shelby Network"}

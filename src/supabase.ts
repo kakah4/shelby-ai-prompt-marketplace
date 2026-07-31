@@ -13,6 +13,7 @@ export interface PromptRow {
   preview: string;
   full_prompt: string;
   sample_output: string;
+  proof_image_url: string;
   creator: string;
   blob_url: string;
   created_at?: string;
