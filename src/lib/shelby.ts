@@ -17,7 +17,7 @@ export async function uploadTextToShelby(text: string, blobName: string): Promis
     body: JSON.stringify({ promptText: text, blobName }),
   });
   const data = await res.json();
-  return data.blobUrl || "";
+  return data.success ? data.blobUrl || "" : "";
 }
 
 export async function uploadFileToShelby(file: File, blobName: string): Promise<string> {
@@ -28,5 +28,5 @@ export async function uploadFileToShelby(file: File, blobName: string): Promise<
     body: JSON.stringify({ base64Data, blobName, contentType: file.type }),
   });
   const data = await res.json();
-  return data.blobUrl || "";
+  return data.success ? data.blobUrl || "" : "";
 }
