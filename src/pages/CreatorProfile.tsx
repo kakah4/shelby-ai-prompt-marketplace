@@ -31,7 +31,7 @@ export default function CreatorProfile() {
   const [editing, setEditing] = useState(false);
   const [displayName, setDisplayName] = useState("");
   const [bio, setBio] = useState("");
-  const [avatarPreview, setAvatarPreview] = useState("");
+  const [avatarPreview, setAvatarPreview] = useState(""); // local preview only, may be a blob: URL
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -59,15 +59,25 @@ export default function CreatorProfile() {
     if (!address) return;
     setSaving(true);
     try {
+      // Default to the existing saved avatar — only replace it if the new upload verifies
       let avatarUrl = creator?.avatar_url || "";
+
       if (avatarFile) {
         showToast("Uploading avatar to Shelby...");
         const ext = avatarFile.name.split(".").pop() || "jpg";
-        avatarUrl = await uploadFileToShelby(avatarFile, `avatars/${address}_${Date.now()}.${ext}`);
+        const uploaded = await uploadFileToShelby(avatarFile, `avatars/${address}_${Date.now()}.${ext}`);
+        if (uploaded) {
+          avatarUrl = uploaded;
+        } else {
+          showToast("Avatar upload couldn't be verified on Shelby — keeping your previous avatar.");
+        }
       }
+
       const updated: CreatorRow = { address, display_name: displayName.trim(), bio: bio.trim(), avatar_url: avatarUrl };
       await upsertCreator(updated);
       setCreator(updated);
+      setAvatarPreview(avatarUrl);
+      setAvatarFile(null);
       setEditing(false);
       showToast("Profile updated!");
     } catch (e: any) {
@@ -132,7 +142,7 @@ export default function CreatorProfile() {
               <button onClick={handleSave} disabled={saving} style={{ ...s.btnPink, cursor: saving ? "not-allowed" : "pointer", opacity: saving ? 0.7 : 1 }}>
                 {saving ? "Saving..." : "Save Profile"}
               </button>
-              <button onClick={() => setEditing(false)} style={{ ...s.btnSec, cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => { setEditing(false); setAvatarFile(null); setAvatarPreview(creator?.avatar_url || ""); }} style={{ ...s.btnSec, cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         ) : (
