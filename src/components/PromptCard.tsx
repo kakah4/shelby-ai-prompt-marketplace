@@ -6,9 +6,10 @@ interface Props {
   prompt: PromptRow;
   creator?: CreatorRow | null;
   onOpen: (p: PromptRow) => void;
+  onDelete?: (p: PromptRow) => void;
 }
 
-export default function PromptCard({ prompt: p, creator, onOpen }: Props) {
+export default function PromptCard({ prompt: p, creator, onOpen, onDelete }: Props) {
   const shortAddr = p.creator ? `${p.creator.slice(0, 6)}...${p.creator.slice(-4)}` : "Unknown";
 
   return (
@@ -18,6 +19,15 @@ export default function PromptCard({ prompt: p, creator, onOpen }: Props) {
       onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.borderColor = "var(--pinkbr)"; (e.currentTarget as HTMLDivElement).style.transform = "translateY(-2px)"; (e.currentTarget as HTMLDivElement).style.boxShadow = "0 8px 40px rgba(255,45,120,0.08)"; }}
       onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = "var(--border)"; (e.currentTarget as HTMLDivElement).style.transform = "none"; (e.currentTarget as HTMLDivElement).style.boxShadow = "none"; }}
     >
+      {onDelete && (
+        <button
+          onClick={e => { e.stopPropagation(); onDelete(p); }}
+          title="Delete this prompt"
+          style={{ position: "absolute", top: 14, right: 14, zIndex: 2, background: "#fff", border: "1px solid var(--border)", color: "var(--pink)", borderRadius: 8, width: 28, height: 28, fontSize: 13, cursor: "pointer" }}
+        >
+          ✕
+        </button>
+      )}
       {p.proof_image_url && <img src={p.proof_image_url} alt={p.title} style={s.cardImg} />}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
         <span style={s.catTag}>{p.category}</span>

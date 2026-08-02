@@ -31,6 +31,12 @@ export async function insertPrompt(prompt: Omit<PromptRow, "created_at">): Promi
   if (error) console.error("insertPrompt error:", error);
 }
 
+export async function deletePrompt(id: number): Promise<boolean> {
+  const { error } = await supabase.from("prompts").delete().eq("id", id);
+  if (error) { console.error("deletePrompt error:", error); return false; }
+  return true;
+}
+
 // ── Creators ─────────────────────────────────────────────
 export async function fetchCreator(address: string): Promise<CreatorRow | null> {
   const { data, error } = await supabase

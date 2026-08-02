@@ -5,7 +5,7 @@ import { styles as s } from "../styles";
 import { useToast } from "../components/Toast";
 import PromptCard from "../components/PromptCard";
 import PromptModal from "../components/PromptModal";
-import { fetchCreator, upsertCreator, fetchPromptsByCreator } from "../lib/supabase";
+import { fetchCreator, upsertCreator, fetchPromptsByCreator, deletePrompt } from "../lib/supabase";
 import { uploadFileToShelby } from "../lib/shelby";
 import type { CreatorRow, PromptRow } from "../types";
 
@@ -28,10 +28,12 @@ export default function CreatorProfile() {
   const [creator, setCreator] = useState<CreatorRow | null>(null);
   const [prompts, setPrompts] = useState<PromptRow[]>([]);
   const [activePrompt, setActivePrompt] = useState<PromptRow | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<PromptRow | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const [editing, setEditing] = useState(false);
   const [displayName, setDisplayName] = useState("");
   const [bio, setBio] = useState("");
-  const [avatarPreview, setAvatarPreview] = useState(""); // local preview only, may be a blob: URL
+  const [avatarPreview, setAvatarPreview] = useState("");
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -59,9 +61,7 @@ export default function CreatorProfile() {
     if (!address) return;
     setSaving(true);
     try {
-      // Default to the existing saved avatar — only replace it if the new upload verifies
       let avatarUrl = creator?.avatar_url || "";
-
       if (avatarFile) {
         showToast("Uploading avatar to Shelby...");
         const ext = avatarFile.name.split(".").pop() || "jpg";
@@ -72,7 +72,6 @@ export default function CreatorProfile() {
           showToast("Avatar upload couldn't be verified on Shelby — keeping your previous avatar.");
         }
       }
-
       const updated: CreatorRow = { address, display_name: displayName.trim(), bio: bio.trim(), avatar_url: avatarUrl };
       await upsertCreator(updated);
       setCreator(updated);
@@ -84,6 +83,23 @@ export default function CreatorProfile() {
       showToast("Save failed: " + (e?.message || "Unknown error"));
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleDeleteConfirmed = async () => {
+    if (!confirmDelete) return;
+    setDeleting(true);
+    try {
+      const ok = await deletePrompt(confirmDelete.id);
+      if (ok) {
+        setPrompts(prev => prev.filter(p => p.id !== confirmDelete.id));
+        showToast("Prompt deleted.");
+      } else {
+        showToast("Could not delete prompt.");
+      }
+    } finally {
+      setDeleting(false);
+      setConfirmDelete(null);
     }
   };
 
@@ -156,13 +172,34 @@ export default function CreatorProfile() {
         ) : (
           <div style={s.grid}>
             {prompts.map(p => (
-              <PromptCard key={p.id} prompt={p} creator={creator} onOpen={setActivePrompt} />
+              <PromptCard
+                key={p.id}
+                prompt={p}
+                creator={creator}
+                onOpen={setActivePrompt}
+                onDelete={isOwner ? setConfirmDelete : undefined}
+              />
             ))}
           </div>
         )}
       </div>
 
       {activePrompt && <PromptModal prompt={activePrompt} onClose={() => setActivePrompt(null)} />}
+
+      {confirmDelete && (
+        <div style={s.overlay} onClick={e => e.target === e.currentTarget && !deleting && setConfirmDelete(null)}>
+          <div style={{ ...s.modal, maxWidth: 380 }}>
+            <h4 style={{ fontFamily: "Syne, sans-serif", fontSize: 18, fontWeight: 800, marginBottom: 10 }}>Delete this prompt?</h4>
+            <p style={{ fontSize: 14, color: "var(--muted)", marginBottom: 24, lineHeight: 1.6 }}>
+              "{confirmDelete.title}" will be removed from the marketplace. This can't be undone.
+            </p>
+            <button onClick={handleDeleteConfirmed} disabled={deleting} style={{ ...s.btnPink, background: "#d92d4c", cursor: deleting ? "not-allowed" : "pointer", opacity: deleting ? 0.7 : 1 }}>
+              {deleting ? "Deleting..." : "Delete Prompt"}
+            </button>
+            <button onClick={() => setConfirmDelete(null)} disabled={deleting} style={{ ...s.btnSec, cursor: "pointer" }}>Cancel</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

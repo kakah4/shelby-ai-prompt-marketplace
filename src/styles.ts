@@ -6,7 +6,7 @@ export const styles: Record<string, React.CSSProperties> = {
   section: { maxWidth: 1140, margin: "0 auto", padding: "80px 48px" },
   sectionTitle: { fontFamily: "Syne, sans-serif", fontSize: 22, fontWeight: 700, letterSpacing: "-0.02em" },
   grid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: 16 },
-  card: { background: "#fff", border: "1px solid var(--border)", borderRadius: 18, padding: 26, cursor: "pointer", transition: "all 0.2s", overflow: "hidden" as const },
+  card: { position: "relative" as const, background: "#fff", border: "1px solid var(--border)", borderRadius: 18, padding: 26, cursor: "pointer", transition: "all 0.2s", overflow: "hidden" as const },
   cardImg: { width: "calc(100% + 52px)", margin: "-26px -26px 16px -26px", height: 160, objectFit: "cover" as const, display: "block" },
   catTag: { fontSize: 11, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase" as const, color: "var(--pink)", background: "var(--pinkbg)", border: "1px solid var(--pinkbr)", padding: "3px 10px", borderRadius: 6 },
   overlay: { display: "flex", position: "fixed", inset: 0, zIndex: 300, background: "rgba(0,0,0,0.5)", backdropFilter: "blur(12px)", alignItems: "center", justifyContent: "center", padding: 20 },
