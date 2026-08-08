@@ -1,11 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { Account, AccountAddress, Ed25519PrivateKey, Network } from "@aptos-labs/ts-sdk";
-import {
-  ShelbyNodeClient,
-  createDefaultErasureCodingProvider,
-  defaultErasureCodingConfig,
-  generateCommitments,
-} from "@shelby-protocol/sdk/node";
+import { ShelbyNodeClient } from "@shelby-protocol/sdk/node";
 
 async function verifyBlobExists(
   client: ShelbyNodeClient,
@@ -13,21 +8,21 @@ async function verifyBlobExists(
   blobName: string,
   attempts = 8,
   delayMs = 2000
-): Promise<boolean> {
+): Promise<{ ok: true } | { ok: false; lastError: string }> {
+  let lastError = "Unknown error";
   for (let i = 0; i < attempts; i++) {
     try {
-      // Use the same documented download() path the /api/blob proxy uses for reads,
-      // rather than a raw authenticated fetch against a hand-built URL.
       const blob = await client.download({ account, blobName });
       // Drain the stream so a body-read failure also counts as unverified.
       await new Response(blob.readable).arrayBuffer();
-      return true;
+      return { ok: true };
     } catch (e: any) {
-      console.log(`verifyBlobExists attempt ${i + 1}/${attempts} failed: ${e.message}`);
+      lastError = e?.message || String(e);
+      console.error(`verifyBlobExists attempt ${i + 1}/${attempts} failed:`, lastError);
     }
     if (i < attempts - 1) await new Promise(r => setTimeout(r, delayMs));
   }
-  return false;
+  return { ok: false, lastError };
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -56,43 +51,34 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const TIME_TO_LIVE = 365 * 24 * 60 * 60 * 1_000_000;
 
     try {
-      // client.upload() is not used here: it unconditionally calls
-      // coordination.getBlobMetadata() first to check whether the blob already exists,
-      // and that call passes the SDK's internal "@<address>/<blobName>" key straight
-      // into an Aptos view-function argument. On this contract/SDK version that key
-      // gets coerced with BigInt(...) somewhere in argument encoding and throws
-      // "Cannot convert @.../... to a BigInt" on every single call — new blob or not.
-      // We replicate upload()'s own logic (register on-chain, wait for confirmation,
-      // then put the bytes) while skipping that broken pre-check entirely.
-      const provider = await createDefaultErasureCodingProvider();
-      const blobCommitments = await generateCommitments(provider, blobData);
-
-      const { transaction } = await client.coordination.registerBlob({
-        account: signer,
-        blobName,
-        blobMerkleRoot: blobCommitments.blob_merkle_root,
-        size: blobData.length,
-        expirationMicros: Date.now() * 1000 + TIME_TO_LIVE,
-        config: defaultErasureCodingConfig(),
-      });
-      await client.coordination.aptos.waitForTransaction({ transactionHash: transaction.hash });
-
-      await client.rpc.putBlob({
-        account: signer.accountAddress,
-        blobName,
+      // @shelby-protocol/sdk was upgraded 0.3.0 -> 0.6.0: the old version's upload()
+      // called coordination.getBlobMetadata() first, which threw a BigInt coercion
+      // error on every call, and its createRegisterBlobPayload() had drifted out of
+      // sync with the deployed contract's register_blob ABI (missing selectedLocation/
+      // locationHint params), causing "Type mismatch for argument 1, expected 'string'".
+      // 0.6.0 removes the broken pre-check and matches the current contract ABI, so we
+      // can go back to the documented client.upload() instead of manually orchestrating
+      // registerBlob/putBlob ourselves.
+      await client.upload({
         blobData,
+        signer,
+        blobName,
+        expirationMicros: Date.now() * 1000 + TIME_TO_LIVE,
       });
-
-      console.log("Upload completed via manual orchestration. txHash:", transaction.hash, "| blobName:", blobName, contentType || "text/plain");
+      console.log("Upload call completed. blobName:", blobName, contentType || "text/plain");
     } catch (uploadErr: any) {
       console.error("Shelby upload failed:", uploadErr.message);
       return res.status(200).json({ success: false, blobUrl: "", error: uploadErr.message });
     }
 
-    const verified = await verifyBlobExists(client, signer.accountAddress, blobName);
-    if (!verified) {
-      console.error("Blob verification failed after upload:", blobName);
-      return res.status(200).json({ success: false, blobUrl: "", error: "Upload could not be verified on Shelby" });
+    const verification = await verifyBlobExists(client, signer.accountAddress, blobName);
+    if (!verification.ok) {
+      console.error("Blob verification failed after upload:", blobName, "| last error:", verification.lastError);
+      return res.status(200).json({
+        success: false,
+        blobUrl: "",
+        error: `Upload could not be verified on Shelby: ${verification.lastError}`,
+      });
     }
 
     const proxyUrl = `/api/blob?name=${encodeURIComponent(blobName)}`;
