@@ -59,11 +59,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       // 0.6.0 removes the broken pre-check and matches the current contract ABI, so we
       // can go back to the documented client.upload() instead of manually orchestrating
       // registerBlob/putBlob ourselves.
+      //
+      // A location is also required now: register_multiple_blobs aborts on-chain with
+      // "No write location could be resolved" for accounts (like our server signer)
+      // that have no stored location preference and no selection. There's no fixed
+      // region name to hardcode, so we look up the chain's actual activated locations
+      // and pass the first one as an authoritative selectedLocation.
+      const locations = await client.metadata.getLocationNames();
+      if (locations.length === 0) {
+        throw new Error("No activated Shelby locations returned by getLocationNames()");
+      }
+      const selectedLocation = locations[0];
+      console.log("Using Shelby location:", selectedLocation, "(available:", locations, ")");
+
       await client.upload({
         blobData,
         signer,
         blobName,
         expirationMicros: Date.now() * 1000 + TIME_TO_LIVE,
+        options: { selectedLocation },
       });
       console.log("Upload call completed. blobName:", blobName, contentType || "text/plain");
     } catch (uploadErr: any) {
