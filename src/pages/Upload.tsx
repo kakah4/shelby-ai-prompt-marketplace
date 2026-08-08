@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { styles as s } from "../styles";
 import { useToast } from "../components/Toast";
-import { insertPrompt } from "../lib/supabase";
-import { uploadTextToShelby, uploadFileToShelby } from "../lib/shelby";
+import { insertPrompt, uploadProofImageToSupabase } from "../lib/supabase";
+import { uploadTextToShelby } from "../lib/shelby";
 import type { PromptRow } from "../types";
 
 function addrToString(address: unknown): string {
@@ -60,18 +60,18 @@ export default function Upload() {
     showToast("Uploading to Shelby network...");
 
     try {
+      const promptId = Date.now();
       const safeTitle = fTitle.trim().replace(/[^a-zA-Z0-9]/g, "_");
-      const blobUrl = await uploadTextToShelby(fPrompt.trim(), `prompts/${Date.now()}_${safeTitle}.txt`);
+      const blobUrl = await uploadTextToShelby(fPrompt.trim(), `prompts/${promptId}_${safeTitle}.txt`);
 
       let proofImageUrl = "";
       if (fImageFile) {
-        showToast("Uploading proof image to Shelby...");
-        const ext = fImageFile.name.split(".").pop() || "jpg";
-        proofImageUrl = await uploadFileToShelby(fImageFile, `proofs/${Date.now()}_${safeTitle}.${ext}`);
+        showToast("Uploading proof image...");
+        proofImageUrl = await uploadProofImageToSupabase(fImageFile, promptId);
       }
 
       const newPrompt: PromptRow = {
-        id: Date.now(),
+        id: promptId,
         title: fTitle.trim(),
         category: fCat,
         price: fPrice || "0.001",

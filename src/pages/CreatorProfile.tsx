@@ -5,8 +5,7 @@ import { styles as s } from "../styles";
 import { useToast } from "../components/Toast";
 import PromptCard from "../components/PromptCard";
 import PromptModal from "../components/PromptModal";
-import { fetchCreator, upsertCreator, fetchPromptsByCreator, deletePrompt } from "../lib/supabase";
-import { uploadFileToShelby } from "../lib/shelby";
+import { fetchCreator, upsertCreator, fetchPromptsByCreator, deletePrompt, uploadAvatarToSupabase } from "../lib/supabase";
 import type { CreatorRow, PromptRow } from "../types";
 
 function addrToString(address: unknown): string {
@@ -63,13 +62,12 @@ export default function CreatorProfile() {
     try {
       let avatarUrl = creator?.avatar_url || "";
       if (avatarFile) {
-        showToast("Uploading avatar to Shelby...");
-        const ext = avatarFile.name.split(".").pop() || "jpg";
-        const uploaded = await uploadFileToShelby(avatarFile, `avatars/${address}_${Date.now()}.${ext}`);
+        showToast("Uploading avatar...");
+        const uploaded = await uploadAvatarToSupabase(avatarFile, address);
         if (uploaded) {
           avatarUrl = uploaded;
         } else {
-          showToast("Avatar upload couldn't be verified on Shelby — keeping your previous avatar.");
+          showToast("Avatar upload failed — keeping your previous avatar.");
         }
       }
       const updated: CreatorRow = { address, display_name: displayName.trim(), bio: bio.trim(), avatar_url: avatarUrl };

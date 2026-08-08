@@ -52,3 +52,27 @@ export async function upsertCreator(creator: Omit<CreatorRow, "created_at">): Pr
   const { error } = await supabase.from("creators").upsert([creator], { onConflict: "address" });
   if (error) console.error("upsertCreator error:", error);
 }
+
+// ── Storage (images) ────────────────────────────────────
+const IMAGES_BUCKET = "proof-images";
+
+async function uploadImageToBucket(file: File, path: string): Promise<string> {
+  const { error } = await supabase.storage.from(IMAGES_BUCKET).upload(path, file, {
+    contentType: file.type,
+    upsert: false,
+  });
+  if (error) { console.error("uploadImageToBucket error:", error); return ""; }
+
+  const { data } = supabase.storage.from(IMAGES_BUCKET).getPublicUrl(path);
+  return data.publicUrl || "";
+}
+
+export async function uploadAvatarToSupabase(file: File, address: string): Promise<string> {
+  const ext = file.name.split(".").pop() || "jpg";
+  return uploadImageToBucket(file, `avatars/${address}_${Date.now()}.${ext}`);
+}
+
+export async function uploadProofImageToSupabase(file: File, promptId: number | string): Promise<string> {
+  const ext = file.name.split(".").pop() || "jpg";
+  return uploadImageToBucket(file, `proofs/${promptId}_${Date.now()}.${ext}`);
+}
