@@ -1,6 +1,11 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { Account, AccountAddress, Ed25519PrivateKey, Network } from "@aptos-labs/ts-sdk";
-import { ShelbyNodeClient } from "@shelby-protocol/sdk/node";
+import {
+  ShelbyNodeClient,
+  createDefaultErasureCodingProvider,
+  defaultErasureCodingConfig,
+  generateCommitments,
+} from "@shelby-protocol/sdk/node";
 
 async function verifyBlobExists(
   client: ShelbyNodeClient,
@@ -51,16 +56,34 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const TIME_TO_LIVE = 365 * 24 * 60 * 60 * 1_000_000;
 
     try {
-      // NOTE: upload() currently resolves to void in this SDK version — the doc comment
-      // promises { transaction, blobCommitments } "when implemented", but it isn't yet.
-      // There is no return value to log; a thrown error is still the only failure signal.
-      const uploadResult = await client.upload({
-        blobData,
-        signer,
+      // client.upload() is not used here: it unconditionally calls
+      // coordination.getBlobMetadata() first to check whether the blob already exists,
+      // and that call passes the SDK's internal "@<address>/<blobName>" key straight
+      // into an Aptos view-function argument. On this contract/SDK version that key
+      // gets coerced with BigInt(...) somewhere in argument encoding and throws
+      // "Cannot convert @.../... to a BigInt" on every single call — new blob or not.
+      // We replicate upload()'s own logic (register on-chain, wait for confirmation,
+      // then put the bytes) while skipping that broken pre-check entirely.
+      const provider = await createDefaultErasureCodingProvider();
+      const blobCommitments = await generateCommitments(provider, blobData);
+
+      const { transaction } = await client.coordination.registerBlob({
+        account: signer,
         blobName,
+        blobMerkleRoot: blobCommitments.blob_merkle_root,
+        size: blobData.length,
         expirationMicros: Date.now() * 1000 + TIME_TO_LIVE,
+        config: defaultErasureCodingConfig(),
       });
-      console.log("Upload call completed. Return value:", uploadResult, "| blobName:", blobName, contentType || "text/plain");
+      await client.coordination.aptos.waitForTransaction({ transactionHash: transaction.hash });
+
+      await client.rpc.putBlob({
+        account: signer.accountAddress,
+        blobName,
+        blobData,
+      });
+
+      console.log("Upload completed via manual orchestration. txHash:", transaction.hash, "| blobName:", blobName, contentType || "text/plain");
     } catch (uploadErr: any) {
       console.error("Shelby upload failed:", uploadErr.message);
       return res.status(200).json({ success: false, blobUrl: "", error: uploadErr.message });
