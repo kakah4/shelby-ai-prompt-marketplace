@@ -1,73 +1,57 @@
-# React + TypeScript + Vite
+# Shelby Prompts Marketplace
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A decentralized marketplace for buying and selling AI prompts (Midjourney, ChatGPT, Claude, Stable Diffusion, and more) — built on Aptos and Shelby.
 
-Currently, two official plugins are available:
+**Live:** https://shelby-ai-prompt-marketplace.vercel.app
+**Repo:** https://github.com/kakah4/shelby-ai-prompt-marketplace
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## What it does
 
-## React Compiler
+Creators upload AI prompts along with proof of what the prompt actually produces — written sample output and an optional screenshot/image — so buyers can judge quality before paying. Buyers unlock the full prompt with an on-chain ShelbyUSD payment straight to the creator's wallet. No platform cut.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## How Shelby is used
 
-## Expanding the ESLint configuration
+The full prompt text — the actual content being sold — is stored as a blob on **Shelby** (Shelbynet), not in a centralized database. When a creator uploads a prompt:
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+1. The prompt text is uploaded to Shelby via `ShelbyNodeClient` (server-side, `api/upload.ts`)
+2. The resulting Shelby blob is served back to the browser through a proxy route (`api/blob.ts`) using the SDK's documented `client.download()` method
+3. Only the Shelby blob URL + listing metadata (title, price, category, sample output, creator address) are indexed in Supabase for browsing/search
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+Avatars and proof-of-output images are stored in Supabase Storage — they're supporting metadata, not the product itself, so the core "buy/sell prompts" flow is what lives on Shelby.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Payments
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Buyers pay ShelbyUSD directly to the creator's connected wallet using Aptos's `0x1::primary_fungible_store::transfer`, signed via Petra (Aptos Wallet Adapter). 100% of the payment goes to the creator.
+
+## Pages
+
+- **`/`** — Landing page
+- **`/browse`** — Browse and filter all listed prompts
+- **`/sell`** — Upload a prompt (title, price, category, full prompt, proof of output)
+- **`/creator/:address`** — Creator profile (avatar, bio, their listed prompts) — editable if it's your own connected wallet
+
+## Stack
+
+- React + TypeScript + Vite
+- Aptos Wallet Adapter (Petra) for wallet connection and payments
+- `@shelby-protocol/sdk` for blob storage on Shelby
+- Supabase for listing metadata, creator profiles, and image storage
+- Vercel for hosting + serverless upload/proxy functions
+
+## Local development
+
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Environment variables
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
 ```
+VITE_SUPABASE_URL=
+VITE_SUPABASE_ANON_KEY=
+SHELBY_API_KEY=
+SHELBY_PRIVATE_KEY=
+```
+
+`SHELBY_API_KEY` and `SHELBY_PRIVATE_KEY` are server-side only (used in `api/upload.ts` and `api/blob.ts`) — they authenticate the app's own Shelby account for storing content. They're unrelated to which wallet a user connects for browsing, selling, or paying.
